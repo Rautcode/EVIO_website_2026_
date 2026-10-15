@@ -1,0 +1,7 @@
+{
+  "type": "commonjs",
+  "dependencies": {
+    "multer": "^2.0.2",
+    "nodemailer": "^10.1.1"
+  }
+}

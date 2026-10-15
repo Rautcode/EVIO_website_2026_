@@ -1,0 +1,60 @@
+@import "tailwindcss";
+
+@theme {
+  --color-evio-navy: #0B2415; /* Changed from Navy to Deep Forest Green for dark backgrounds */
+  --color-evio-blue: #0E9138; /* Changed from Electric Blue to EVIO Green for highlights */
+  --color-evio-amber: #F4F6F5; /* Changed from Amber to a subtle light green-gray */
+  --color-evio-white: #FFFFFF;
+  --color-evio-black: #1A1918; /* Changed from generic black to EVIO Black */
+  --color-evio-light-gray: #F4F6F5; /* Neutral light background */
+
+  --font-syne: "Syne", sans-serif;
+  --font-inter: "Inter", sans-serif;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-evio-white);
+    color: var(--color-evio-black);
+    font-family: var(--font-inter);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-syne);
+    font-weight: 700;
+    color: inherit;
+  }
+  
+  html.lenis {
+    height: auto;
+  }
+  
+  .lenis.lenis-smooth {
+    scroll-behavior: auto;
+  }
+  
+  .lenis.lenis-smooth [data-lenis-prevent] {
+    overscroll-behavior: contain;
+  }
+  
+  .lenis.lenis-stopped {
+    overflow: hidden;
+  }
+  
+  .lenis.lenis-scrolling iframe {
+    pointer-events: none;
+  }
+}
+
+@layer utilities {
+  @keyframes marquee {
+    0% { transform: translateX(0%); }
+    100% { transform: translateX(-50%); }
+  }
+  .animate-marquee {
+    animation: marquee 25s linear infinite;
+  }
+}

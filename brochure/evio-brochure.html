@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>EVIO Private Limited — Company Brochure 2026</title>
+<!--
+  Source for public/downloads/EVIO-Company-Brochure-2026.pdf
+  Rebuild:  node brochure/build.cjs
+  All facts mirror the website (src/data/*, ServiceDetail.jsx). Update both together.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  @page { size: A4; margin: 0; }
+  :root {
+    --forest: #0B2415; --deep: #062016; --green: #0E9138; --green-dk: #007d39;
+    --mint: #4ade80; --ink: #1A1918; --muted: #5b6460; --line: #e3e8e5; --paper: #F4F6F5;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { font-family: Inter, sans-serif; color: var(--ink); font-size: 9.6pt; line-height: 1.5; }
+  h1, h2, h3, .num { font-family: Syne, sans-serif; letter-spacing: -0.01em; }
+  .page { width: 210mm; height: 297mm; position: relative; overflow: hidden; page-break-after: always; background: #fff; }
+  .page:last-child { page-break-after: auto; }
+  .pad { padding: 16mm 15mm 0; }
+  .eyebrow { font: 700 7.5pt Inter, sans-serif; letter-spacing: .18em; text-transform: uppercase; color: var(--green); margin-bottom: 3mm; }
+  h2 { font-size: 24pt; line-height: 1.08; color: var(--forest); margin-bottom: 4mm; }
+  h3 { font-size: 13pt; color: var(--forest); margin-bottom: 2mm; }
+  p.lead { font-size: 11pt; color: #3b4440; max-width: 160mm; }
+  .muted { color: var(--muted); }
+  ul.ticks { list-style: none; }
+  ul.ticks li { position: relative; padding-left: 5mm; margin-bottom: 1.6mm; }
+  ul.ticks li::before { content: ""; position: absolute; left: 0; top: 1.9mm; width: 2.2mm; height: 2.2mm; border-radius: 50%; background: var(--green); }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8mm; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4mm; }
+  .photo { width: 100%; object-fit: cover; border-radius: 3mm; display: block; }
+  .chips { display: flex; flex-wrap: wrap; gap: 1.6mm; }
+  .chip { font-size: 7.6pt; padding: 1mm 2.6mm; border-radius: 10mm; background: var(--paper); color: var(--forest); }
+  .rule { height: 1px; background: var(--line); margin: 6mm 0; }
+
+  /* Running footer */
+  .foot { position: absolute; left: 15mm; right: 15mm; bottom: 9mm; display: flex; justify-content: space-between; align-items: center; font-size: 7.5pt; color: var(--muted); border-top: 1px solid var(--line); padding-top: 3mm; }
+  .foot img { height: 7mm; }
+  .dark .foot { color: rgba(255,255,255,.55); border-color: rgba(255,255,255,.15); }
+
+  /* Partner strip */
+  .partners { margin-top: 4mm; padding: 3.5mm 4mm; border: 1px solid var(--line); border-radius: 3mm; }
+  .partners .label { font: 700 6.8pt Inter, sans-serif; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin-bottom: 2.5mm; }
+  .logos { display: flex; flex-wrap: wrap; align-items: center; gap: 3mm 6mm; }
+  .logos img { height: 8.5mm; width: auto; max-width: 34mm; object-fit: contain; }
+  .logos img.sq { height: 7mm; }
+  .logos .txt { font: 700 9pt Inter, sans-serif; letter-spacing: .06em; color: #c8102e; }
+
+  /* Service block */
+  .svc { display: grid; grid-template-columns: 1.15fr 1fr; gap: 7mm; }
+  .svc + .svc { margin-top: 9mm; padding-top: 8mm; border-top: 1px solid var(--line); }
+  .svc .sub { font-weight: 600; color: var(--green-dk); margin-bottom: 2.5mm; }
+  .svc p { margin-bottom: 3mm; color: #3b4440; }
+  .svc .photo { height: 52mm; }
+
+  /* Stats */
+  .stat .num { font-size: 19pt; font-weight: 800; color: #fff; line-height: 1; white-space: nowrap; }
+  .stat .lbl { font-size: 8pt; color: rgba(255,255,255,.7); margin-top: 1.5mm; }
+  .statbox { background: var(--forest); border-radius: 4mm; padding: 7mm; display: grid; grid-template-columns: repeat(3, 1fr); gap: 6mm 5mm; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 8.8pt; }
+  th { background: var(--forest); color: #fff; text-align: left; padding: 2.4mm 3mm; font-weight: 600; }
+  td { padding: 2.2mm 3mm; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tr:nth-child(even) td { background: var(--paper); }
+  .dot { display: inline-block; width: 2.4mm; height: 2.4mm; border-radius: 50%; margin-right: 2mm; vertical-align: middle; }
+  .dot.done { background: var(--green); } .dot.wip { background: #f59e0b; }
+</style>
+</head>
+<body>
+
+<!-- 1. COVER -->
+<section class="page dark" style="background: var(--deep); color: #fff;">
+  <div style="position:absolute; top:0; left:0; right:0; height:150mm; display:grid; grid-template-columns:1fr 1fr 1fr; gap:1.5mm;">
+    <img src="../public/images/projects/real/flipkart.jpg" alt="" style="width:100%; height:100%; object-fit:cover;">
+    <img src="../public/images/projects/real/data-centre.jpg" alt="" style="width:100%; height:100%; object-fit:cover;">
+    <img src="../public/images/projects/real/ineos.jpg" alt="" style="width:100%; height:100%; object-fit:cover;">
+  </div>
+  <div style="position:absolute; inset:0; background: linear-gradient(180deg, rgba(6,32,22,.75) 0%, rgba(6,32,22,0) 22%, rgba(6,32,22,0) 38%, var(--deep) 51%);"></div>
+  <div style="position:absolute; top:150mm; left:0; right:0; height:1.6mm; background: linear-gradient(90deg, var(--green), var(--mint));"></div>
+  <img src="../public/brand/evio-logo-white.svg" alt="EVIO Private Limited" style="position:absolute; top:14mm; left:15mm; height:15mm;">
+  <div style="position:absolute; left:15mm; right:15mm; bottom:34mm;">
+    <div class="eyebrow" style="color: var(--mint);">Company Brochure 2026</div>
+    <h1 style="font-size:38pt; line-height:1.02; margin-bottom:6mm;">Complex Challenges,<br>Intelligent Engineering.</h1>
+    <p style="font-size:12pt; color: rgba(255,255,255,.78); max-width:150mm; margin-bottom:9mm;">
+      Turnkey electrical, automation and building-systems contractor for industry, infrastructure and mission-critical data centres across India.
+    </p>
+    <div style="display:flex; gap:8mm; font-size:9pt; color: rgba(255,255,255,.85);">
+      <div><span class="num" style="font-size:18pt; color:var(--mint);">15</span><br>years · since 2011</div>
+      <div><span class="num" style="font-size:18pt; color:var(--mint);">295 MW</span><br>data centre capacity</div>
+      <div><span class="num" style="font-size:18pt; color:var(--mint);">Zero LTI</span><br>in five years</div>
+    </div>
+  </div>
+  <div style="position:absolute; left:15mm; right:15mm; bottom:13mm; display:flex; justify-content:space-between; font-size:8.5pt; color: rgba(255,255,255,.6); border-top:1px solid rgba(255,255,255,.18); padding-top:4mm;">
+    <span>Engineering &nbsp;|&nbsp; Innovation &nbsp;|&nbsp; Automation</span><span>www.evio.in</span>
+  </div>
+</section>
+
+<!-- 2. ABOUT -->
+<section class="page">
+  <div class="pad">
+    <div class="eyebrow">About EVIO</div>
+    <h2>A dependable partner for project execution</h2>
+    <p class="lead" style="margin-bottom:6mm;">
+      EVIO Private Limited is a turnkey electrical, instrumentation and automation contractor, founded in 2011 by
+      Gopal M. Kandoi, a senior technocrat with five decades in the electrical &amp; automation domain. We offer value
+      engineering, deep industry experience, in-house skills and the capability to conceptualise and execute engineering
+      solutions tailored to each client, working with top global technology brands.
+    </p>
+
+    <div class="statbox" style="margin-bottom:8mm;">
+      <div class="stat"><div class="num">15 yrs</div><div class="lbl">Delivering turnkey projects since 2011</div></div>
+      <div class="stat"><div class="num">295 MW</div><div class="lbl">Data centre capacity worked on</div></div>
+      <div class="stat"><div class="num">10 cities</div><div class="lbl">Data centre footprint across India</div></div>
+      <div class="stat"><div class="num">1.9 Cr+</div><div class="lbl">Safe man-hours, FY21–FY25</div></div>
+      <div class="stat"><div class="num">Zero LTI</div><div class="lbl">Lost-time injuries in five years</div></div>
+      <div class="stat"><div class="num">ISO</div><div class="lbl">9001:2015 &amp; 45001:2018 certified · Great Place To Work®</div></div>
+    </div>
+
+    <div class="grid3" style="margin-bottom:8mm;">
+      <div><h3>Customer first</h3><p class="muted">Tireless effort, exceptional commitment and fair pricing, built on trust, respect and transparency.</p></div>
+      <div><h3>Safety first</h3><p class="muted">The health and safety of our people, our customers' property and our subcontractors takes precedence on every site.</p></div>
+      <div><h3>Quality &amp; reliability</h3><p class="muted">Results-oriented delivery, continual process improvement and full compliance with legal requirements.</p></div>
+    </div>
+
+    <div class="grid2" style="grid-template-columns: 1.3fr 1fr; align-items:start;">
+      <img class="photo" src="../public/images/life/team-entire.jpg" alt="The EVIO team" style="height:62mm;">
+      <div>
+        <h3>What we do</h3>
+        <ul class="ticks">
+          <li>Turnkey Electrical &amp; MEP</li>
+          <li>Data Centre Electrical Infrastructure</li>
+          <li>Industrial Automation <span class="muted">(Siemens)</span></li>
+          <li>Building Automation &amp; IBMS</li>
+          <li>Lighting Automation <span class="muted">(Helvar)</span></li>
+          <li>Industrial IoT <span class="muted">(Altizon)</span></li>
+        </ul>
+        <p class="muted" style="margin-top:3mm;">Offices in Mumbai (HQ), Pune and Bengaluru, executing projects pan-India.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><img src="../public/brand/evio-logo.svg" alt=""><span>02</span></div>
+</section>
+
+<!-- 3. DATA CENTRES -->
+<section class="page dark" style="background: var(--forest); color:#fff;">
+  <div class="pad">
+    <div class="eyebrow" style="color:var(--mint);">Data Centre Vertical</div>
+    <h2 style="color:#fff;">Electrical infrastructure for mission-critical data centres</h2>
+    <p class="lead" style="color:rgba(255,255,255,.75); margin-bottom:7mm;">
+      Turnkey high-side and low-side electrical works for hyperscale and colocation data centres, from HT intake to
+      UPS output, built to the client's Tier design and aligned to TIA-942 and Uptime Institute guidelines.
+    </p>
+    <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:4mm; margin-bottom:7mm;">
+      <div class="stat" style="background:rgba(255,255,255,.07); border-radius:3mm; padding:5mm;"><div class="num" style="color:var(--mint);">295 MW</div><div class="lbl">Capacity worked on</div></div>
+      <div class="stat" style="background:rgba(255,255,255,.07); border-radius:3mm; padding:5mm;"><div class="num" style="color:var(--mint);">7</div><div class="lbl">Data centre clients</div></div>
+      <div class="stat" style="background:rgba(255,255,255,.07); border-radius:3mm; padding:5mm;"><div class="num" style="color:var(--mint);">10</div><div class="lbl">Cities</div></div>
+      <div class="stat" style="background:rgba(255,255,255,.07); border-radius:3mm; padding:5mm;"><div class="num" style="color:var(--mint);">4 + 3</div><div class="lbl">Completed + in progress</div></div>
+    </div>
+    <div class="grid2" style="grid-template-columns: 1.25fr 1fr; gap:7mm;">
+      <div style="background:#fff; color:var(--ink); border-radius:3mm; overflow:hidden;">
+        <table>
+          <tr><th>City</th><th>Data centre programmes</th></tr>
+          <tr><td><span class="dot done"></span><b>Hyderabad</b></td><td>Microsoft HYD-01</td></tr>
+          <tr><td><span class="dot wip"></span><b>Mumbai &amp; Navi Mumbai</b></td><td>NTT · CtrlS · AdaniConneX · Digital Edge</td></tr>
+          <tr><td><span class="dot wip"></span><b>Pune</b></td><td>ST Telemedia · AdaniConneX</td></tr>
+          <tr><td><span class="dot done"></span><b>Delhi NCR</b></td><td>ST Telemedia (New Delhi) · Sify (Noida)</td></tr>
+          <tr><td><span class="dot done"></span><b>Ahmedabad</b></td><td>ST Telemedia</td></tr>
+          <tr><td><span class="dot done"></span><b>Bengaluru</b></td><td>ST Telemedia</td></tr>
+          <tr><td><span class="dot done"></span><b>Chennai</b></td><td>ST Telemedia</td></tr>
+          <tr><td><span class="dot done"></span><b>Kolkata</b></td><td>NTT</td></tr>
+        </table>
+        <div style="padding:2.5mm 3mm; font-size:7.5pt; color:var(--muted);"><span class="dot done"></span>Completed &nbsp;&nbsp; <span class="dot wip"></span>Includes work in progress</div>
+      </div>
+      <div>
+        <h3 style="color:#fff;">Capabilities</h3>
+        <ul class="ticks" style="color:rgba(255,255,255,.85);">
+          <li>HT / LT panels: installation, termination &amp; testing</li>
+          <li>HT, LT &amp; control cabling on trays and ladders</li>
+          <li>DG sets &amp; fuel systems</li>
+          <li>Modular &amp; centralised UPS systems</li>
+          <li>Busduct &amp; cable management for data halls</li>
+          <li>Earthing &amp; lightning protection</li>
+          <li>Testing &amp; commissioning support, L1 to L5</li>
+          <li>Heavy electrical equipment handling</li>
+        </ul>
+        <div style="margin-top:5mm; padding:4mm; border-radius:3mm; background:rgba(74,222,128,.12); font-size:8.6pt; color:rgba(255,255,255,.85);">
+          <b style="color:var(--mint);">Featured: AdaniConneX, Pune.</b> 48 MW colocation campus (5 × 9.6 MW halls): HT &amp; LT cabling, isolation transformers, lighting, earthing and lightning protection over a 24-month programme.
+        </div>
+      </div>
+    </div>
+  </div>
+  <img src="../public/images/projects/real/data-centre.jpg" alt="EVIO data centre electrical works" style="position:absolute; left:15mm; right:15mm; bottom:24mm; width:180mm; height:48mm; object-fit:cover; border-radius:3mm; opacity:.9;">
+  <div class="foot"><img src="../public/brand/evio-logo-white.svg" alt=""><span>03</span></div>
+</section>
+
+<!-- 4. TURNKEY ELECTRICAL & MEP -->
+<section class="page">
+  <div class="pad">
+    <div class="eyebrow">Services</div>
+    <h2 style="margin-bottom:7mm;">Turnkey Electrical &amp; MEP</h2>
+
+    <div class="svc">
+      <div>
+        <h3>Turnkey Electrical Solutions</h3>
+        <div class="sub">End-to-end HT &amp; LT electrical contracting from concept to commissioning.</div>
+        <p>Total electrification solutions for industrial, commercial and infrastructure projects, delivered with zero-compromise safety standards.</p>
+        <ul class="ticks">
+          <li>Power infrastructure: switchyards up to 132 kV, transformers, HT/LT panels &amp; DGs</li>
+          <li>Internal &amp; external electrification for industrial and commercial projects</li>
+          <li>Illumination: cabling, street-light and high-mast installations</li>
+          <li>Specialised installations: clean rooms, flame-proof areas, instrumentation</li>
+          <li>Complete testing, CEIG approvals &amp; handover</li>
+        </ul>
+      </div>
+      <div>
+        <img class="photo" src="../public/images/projects/real/flipkart.jpg" alt="Flipkart Haringhata logistics hub">
+        <p class="muted" style="font-size:7.8pt; margin-top:2mm;">Flipkart Big Box, Haringhata: 500 km of HT &amp; LT cable, 32,000 light fixtures, 16 HT/LT panels.</p>
+      </div>
+    </div>
+
+    <div class="svc">
+      <div>
+        <h3>MEP Contracting</h3>
+        <div class="sub">Fully coordinated Mechanical, Electrical and Plumbing execution.</div>
+        <p>A unified MEP service under one roof: we eliminate clashes between trades, reduce delays and raise the standard of overall quality.</p>
+        <ul class="ticks">
+          <li>Coordinated 3D design &amp; BIM clash resolution</li>
+          <li>HVAC solutions</li>
+          <li>Plumbing &amp; drainage</li>
+          <li>Electrical integration</li>
+          <li>Centralised project management &amp; integrated commissioning</li>
+        </ul>
+      </div>
+      <div>
+        <img class="photo" src="../public/images/projects/real/odisha-secretariat.jpg" alt="Odisha Secretariat">
+        <div class="chips" style="margin-top:3mm;">
+          <span class="chip">Pharmaceuticals</span><span class="chip">FMCG</span><span class="chip">Data Centres</span><span class="chip">Manufacturing</span><span class="chip">Healthcare</span><span class="chip">Commercial</span><span class="chip">Infrastructure</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><img src="../public/brand/evio-logo.svg" alt=""><span>04</span></div>
+</section>
+
+<!-- 5. INDUSTRIAL AUTOMATION & IIOT -->
+<section class="page">
+  <div class="pad">
+    <div class="eyebrow">Services</div>
+    <h2 style="margin-bottom:7mm;">Industrial Automation &amp; Industrial IoT</h2>
+
+    <div class="svc">
+      <div>
+        <h3>Industrial Automation</h3>
+        <div class="sub">Factory and process automation for enhanced industrial efficiency.</div>
+        <p>An in-house software team delivering end-to-end automation, from design, engineering and software development through commissioning, maintenance and support, for systems of any size.</p>
+        <ul class="ticks">
+          <li>Design &amp; engineering, PLC/SCADA architecture</li>
+          <li>Software development &amp; panel FAT</li>
+          <li>PLC &amp; SCADA commissioning</li>
+          <li>Mission-critical automation with redundant controllers &amp; networks</li>
+          <li>End-to-end maintenance &amp; support</li>
+        </ul>
+        <div class="partners">
+          <div class="label">Technology partner</div>
+          <div class="logos"><img class="sq" src="../public/brand/partners/siemens.png" alt="Siemens"></div>
+        </div>
+      </div>
+      <div>
+        <img class="photo" src="../public/images/projects/real/escientia.jpg" alt="Escientia Advanced Sciences">
+        <div class="chips" style="margin-top:3mm;">
+          <span class="chip">Automobile</span><span class="chip">Chemicals</span><span class="chip">Oil &amp; Gas</span><span class="chip">FMCG</span><span class="chip">Pharma</span><span class="chip">Water Treatment</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="svc">
+      <div>
+        <h3>Industrial IoT</h3>
+        <div class="sub">Real-time visibility and predictive analytics from the factory floor.</div>
+        <p>Since our 2018 partnership with Altizon, we bridge Operational Technology and IT, extracting data securely from legacy and modern equipment via OPC-UA and MQTT into cloud or edge dashboards.</p>
+        <ul class="ticks">
+          <li>Sensor networks &amp; edge gateways</li>
+          <li>Real-time dashboards, OEE &amp; downtime tracking</li>
+          <li>Predictive maintenance analytics</li>
+          <li>Cloud / ERP integration</li>
+        </ul>
+        <div class="partners">
+          <div class="label">Technology partner</div>
+          <div class="logos"><img class="sq" src="../public/brand/partners/altizon.png" alt="Altizon"></div>
+        </div>
+      </div>
+      <div>
+        <img class="photo" src="../public/images/projects/real/cummins.jpg" alt="Cummins">
+      </div>
+    </div>
+  </div>
+  <div class="foot"><img src="../public/brand/evio-logo.svg" alt=""><span>05</span></div>
+</section>
+
+<!-- 6. BUILDING & LIGHTING AUTOMATION -->
+<section class="page">
+  <div class="pad">
+    <div class="eyebrow">Services</div>
+    <h2 style="margin-bottom:7mm;">Building &amp; Lighting Automation</h2>
+
+    <div class="svc">
+      <div>
+        <h3>Building Automation &amp; IBMS</h3>
+        <div class="sub">Intelligent systems for efficiency, sustainability and productivity.</div>
+        <p>Engineering, execution and commissioning of smart building systems that integrate fire, security, HVAC and lighting to cut energy use and operating cost.</p>
+        <ul class="ticks">
+          <li>Fire detection &amp; alarm, NOVEC gas suppression, VESDA</li>
+          <li>Building Management System: trends, alarms, hot/cold aisle monitoring</li>
+          <li>CCTV, access control &amp; biometric systems</li>
+          <li>Public address &amp; fire alarm integration</li>
+        </ul>
+      </div>
+      <div>
+        <img class="photo" src="../public/images/projects/real/jio-world-drive.jpg" alt="Jio World Drive">
+      </div>
+    </div>
+    <div class="partners" style="margin-top:5mm;">
+      <div class="label">Technology partners</div>
+      <div class="logos">
+        <img src="../public/brand/partners/notifier-honeywell.png" alt="Notifier by Honeywell">
+        <img src="../public/brand/partners/edwards.png" alt="Edwards">
+        <img src="../public/brand/partners/bosch.svg" alt="Bosch">
+        <img src="../public/brand/partners/matrix.png" alt="Matrix ComSec">
+        <img src="../public/brand/partners/hikvision.svg" alt="Hikvision">
+        <img src="../public/brand/partners/d-link.svg" alt="D-Link">
+        <img src="../public/brand/partners/hid.svg" alt="HID">
+      </div>
+    </div>
+
+    <div class="svc" style="margin-top:9mm;">
+      <div>
+        <h3>Lighting Automation</h3>
+        <div class="sub">Smart lighting for energy conservation and the right ambiance.</div>
+        <p>From single-luminaire solutions to complete building lighting systems, integrated with other building systems, with remote monitoring and predictive energy savings.</p>
+        <ul class="ticks">
+          <li>DALI: individual luminaire control &amp; scene setting</li>
+          <li>Wireless lighting controls &amp; smartphone integration</li>
+          <li>Daylight &amp; presence-based automation</li>
+          <li>Reference: The Leela Palace, Gandhinagar, 13 lighting control DBs</li>
+        </ul>
+        <div class="partners">
+          <div class="label">Technology partner</div>
+          <div class="logos"><img src="../public/brand/partners/helvar.png" alt="Helvar" style="height:10mm;"></div>
+        </div>
+      </div>
+      <div>
+        <img class="photo" src="../public/images/projects/real/leela.jpg" alt="The Leela Palace, Gandhinagar">
+      </div>
+    </div>
+  </div>
+  <div class="foot"><img src="../public/brand/evio-logo.svg" alt=""><span>06</span></div>
+</section>
+
+<!-- 7. PROJECTS & CLIENTS -->
+<section class="page">
+  <div class="pad">
+    <div class="eyebrow">Selected Projects</div>
+    <h2 style="margin-bottom:6mm;">Trusted by India's leading enterprises</h2>
+    <div class="grid3" style="margin-bottom:7mm;">
+      <figure><img class="photo" src="../public/images/projects/real/myntra.jpg" style="height:38mm;" alt=""><figcaption style="font-size:8pt; margin-top:1.5mm;"><b>Myntra</b> · Embassy Industrial Park, NCR</figcaption></figure>
+      <figure><img class="photo" src="../public/images/projects/real/iit-hyderabad.jpg" style="height:38mm;" alt=""><figcaption style="font-size:8pt; margin-top:1.5mm;"><b>IIT Hyderabad</b> · Campus electrical works</figcaption></figure>
+      <figure><img class="photo" src="../public/images/projects/real/ineos.jpg" style="height:38mm;" alt=""><figcaption style="font-size:8pt; margin-top:1.5mm;"><b>Ineos</b> · 66 kV switchyard</figcaption></figure>
+      <figure><img class="photo" src="../public/images/projects/real/nirma.jpg" style="height:38mm;" alt=""><figcaption style="font-size:8pt; margin-top:1.5mm;"><b>Nirma</b> · 60 TPD caustic soda plant</figcaption></figure>
+      <figure><img class="photo" src="../public/images/projects/real/yokohama.jpg" style="height:38mm;" alt=""><figcaption style="font-size:8pt; margin-top:1.5mm;"><b>Yokohama</b> · 6.6 kV expansion, Bahadurgarh</figcaption></figure>
+      <figure><img class="photo" src="../public/images/projects/real/hccb.jpg" style="height:38mm;" alt=""><figcaption style="font-size:8pt; margin-top:1.5mm;"><b>HCCB</b> · Electrical, CCTV &amp; access, Khurda</figcaption></figure>
+    </div>
+
+    <div class="grid2">
+      <blockquote style="background:var(--paper); border-radius:3mm; padding:5mm; font-size:9pt;">
+        <p style="font-style:italic; margin-bottom:3mm;">"This is to inform that M/s. EVIO Pvt. Ltd. has successfully completed the Campus Development Electrical Works for IIT Hyderabad (Package 3B) at Kandi, Sangareddy, Telangana. … Their execution quality, commitment, and professionalism have been commendable."</p>
+        <b>Shapoorji Pallonji &amp; Company Pvt. Ltd.</b>
+      </blockquote>
+      <blockquote style="background:var(--paper); border-radius:3mm; padding:5mm; font-size:9pt;">
+        <p style="font-style:italic; margin-bottom:3mm;">"EVIO Pvt. Ltd. has successfully executed the supply, installation, testing and commissioning of electrical system works at RG1A underground car park project in BKC, Mumbai. During the project we have found EVIO satisfactory in terms of safety, quality, resources, augmentation and progress of works."</p>
+        <b>Larsen &amp; Toubro Limited</b>
+      </blockquote>
+    </div>
+
+    <div class="rule"></div>
+    <div class="label eyebrow" style="color:var(--muted);">Clients include</div>
+    <p style="font-size:9pt; color:#3b4440; line-height:1.8;">
+      Microsoft · NTT DATA · ST Telemedia GDC · AdaniConneX · Digital Edge · Sify · CtrlS · Flipkart · Myntra · Larsen &amp; Toubro ·
+      Tata Communications · Shapoorji Pallonji · Tata Consulting Engineers · CEAT · Yokohama · Nirma · Alpla · BPCL · Biocon ·
+      Cummins · IFFCO · Lodha · Jio · The Leela · HCCB · Ineos
+    </p>
+  </div>
+  <div class="foot"><img src="../public/brand/evio-logo.svg" alt=""><span>07</span></div>
+</section>
+
+<!-- 8. SAFETY & CONTACT (back cover) -->
+<section class="page dark" style="background: var(--deep); color:#fff;">
+  <div class="pad">
+    <div class="eyebrow" style="color:var(--mint);">Safety &amp; Quality</div>
+    <h2 style="color:#fff;">Safety is measured, not assumed</h2>
+    <p class="lead" style="color:rgba(255,255,255,.75); margin-bottom:7mm;">
+      Across five years and more than 1.9 crore safe man-hours, EVIO has recorded zero lost-time injuries and zero
+      fatalities, with 3.6 lakh+ training hours and over 85,000 unsafe acts and conditions reported and closed.
+    </p>
+    <div class="grid2" style="gap:9mm; align-items:end;">
+      <div>
+        <div style="font-size:8pt; color:rgba(255,255,255,.6); margin-bottom:3mm;">Safe man-hours per year (lakh) · company-wide</div>
+        <div style="display:flex; align-items:flex-end; gap:4mm; height:46mm;">
+          <div style="flex:1; text-align:center;"><div style="font-size:8pt;">31.9</div><div style="height:28mm; background:var(--green); border-radius:1.5mm 1.5mm 0 0;"></div><div style="font-size:7.5pt; color:rgba(255,255,255,.6);">FY21</div></div>
+          <div style="flex:1; text-align:center;"><div style="font-size:8pt;">31.2</div><div style="height:27.4mm; background:var(--green); border-radius:1.5mm 1.5mm 0 0;"></div><div style="font-size:7.5pt; color:rgba(255,255,255,.6);">FY22</div></div>
+          <div style="flex:1; text-align:center;"><div style="font-size:8pt;">35.5</div><div style="height:31.1mm; background:var(--green); border-radius:1.5mm 1.5mm 0 0;"></div><div style="font-size:7.5pt; color:rgba(255,255,255,.6);">FY23</div></div>
+          <div style="flex:1; text-align:center;"><div style="font-size:8pt;">39.7</div><div style="height:34.8mm; background:var(--green); border-radius:1.5mm 1.5mm 0 0;"></div><div style="font-size:7.5pt; color:rgba(255,255,255,.6);">FY24</div></div>
+          <div style="flex:1; text-align:center;"><div style="font-size:8pt;">52.4</div><div style="height:40mm; background:var(--mint); border-radius:1.5mm 1.5mm 0 0;"></div><div style="font-size:7.5pt; color:rgba(255,255,255,.6);">FY25</div></div>
+        </div>
+        <div style="margin-top:4mm; padding:3.5mm; border-radius:3mm; background:rgba(255,255,255,.07); font-family:Inter,sans-serif; font-weight:700; font-size:10pt;">0 LTI · 0 major incidents · 0 fatalities · 0 fires</div>
+      </div>
+      <div>
+        <h3 style="color:#fff;">Quality on every site</h3>
+        <ul class="ticks" style="color:rgba(255,255,255,.85); font-size:9pt;">
+          <li>Approved method statement before every activity</li>
+          <li>Incoming material inspection against approved makes</li>
+          <li>Joint inspection (RFWI) before each next stage</li>
+          <li>Testing with calibrated instruments</li>
+          <li>Commissioning tagged L1 to L5</li>
+          <li>Non-conformances closed through RCA &amp; CAPA</li>
+        </ul>
+        <p style="margin-top:3mm; font-size:8.5pt; color:var(--mint);">ISO 9001:2015 · ISO 45001:2018 · Great Place To Work® Certified</p>
+      </div>
+    </div>
+
+    <div style="height:1px; background:rgba(255,255,255,.15); margin:10mm 0 8mm;"></div>
+    <div class="eyebrow" style="color:var(--mint);">Contact</div>
+    <h2 style="color:#fff; font-size:20pt;">Discuss your next project</h2>
+    <div class="grid3" style="margin-top:5mm; font-size:8.6pt; color:rgba(255,255,255,.82);">
+      <div><b style="color:#fff;">Mumbai (HQ)</b><br>Plot No. A10, Cross Road B, MIDC Industrial Area, Marol, Andheri (E), Mumbai – 400 093<br><b style="color:var(--mint);">+91 22 4576 6700</b></div>
+      <div><b style="color:#fff;">Pune</b><br>403, 4th Floor, Gheewala Complex, Station Road, Near Tata Motors, Chinchwad, Pune – 411 033<br><b style="color:var(--mint);">+91 20 2735 0104 / 105</b></div>
+      <div><b style="color:#fff;">Bengaluru</b><br>No. 246/5, 14th 'A' Main Road, 3rd Cross, HMT Layout, Mathikere, Bengaluru – 560 054<br><b style="color:var(--mint);">+91 80 2337 7878</b></div>
+    </div>
+  </div>
+  <div style="position:absolute; left:15mm; right:15mm; bottom:11mm; display:flex; justify-content:space-between; align-items:center; border-top:1px solid rgba(255,255,255,.15); padding-top:5mm;">
+    <img src="../public/brand/evio-logo-white.svg" alt="EVIO Private Limited" style="height:12mm;">
+    <div style="text-align:right; font-size:9pt;"><b>mumbai@evio.in</b><br><span style="color:var(--mint);">www.evio.in</span></div>
+  </div>
+</section>
+
+</body>
+</html>
