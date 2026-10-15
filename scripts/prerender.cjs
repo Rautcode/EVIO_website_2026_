@@ -20,7 +20,6 @@ const browser = [
     '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
     '/usr/bin/google-chrome',
 ].find(fs.existsSync);
-if (!browser) throw new Error('No Edge/Chrome found for pre-rendering');
 
 const routes = [...fs.readFileSync(path.join(root, 'public', 'sitemap.xml'), 'utf8').matchAll(/<loc>https?:\/\/[^/]+(\/[^<]*)<\/loc>/g)]
     .map(m => m[1]);
@@ -31,7 +30,12 @@ const get = (url) => new Promise((resolve) => {
 
 (async () => {
     // Keep the untouched SPA shell for routes that are not pre-rendered (e.g. /admin).
+    // Hosting rewrites unknown routes to it, so it must exist even when pre-rendering is skipped.
     fs.copyFileSync(path.join(dist, 'index.html'), path.join(dist, '200.html'));
+    if (!browser) {
+        console.warn('! No Chrome/Edge here (e.g. a cloud build): skipping pre-render, deploying as a plain SPA.');
+        return;
+    }
 
     const server = spawn(process.execPath, [path.join(root, 'node_modules', 'vite', 'bin', 'vite.js'), 'preview', '--port', String(PORT), '--strictPort'], { cwd: root, stdio: 'ignore' });
     try {
