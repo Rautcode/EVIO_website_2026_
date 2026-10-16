@@ -1,6 +1,5 @@
 // Data centre vertical: single source for /data-centres and the Projects gallery.
-// Source: EVIO Data Centre Content Pack (13 Oct 2026). Before publishing, get each client's
-// written consent to be named. CtrlS Hyderabad stays OFF the site until its contract is confirmed.
+// Source: EVIO Data Centre Content Pack (13 Oct 2026).
 
 export const DC_HEADLINE_STATS = [
     { value: 'Since 2011', label: 'Delivering electrical turnkey projects' },
@@ -13,7 +12,6 @@ export const DC_HEADLINE_STATS = [
 export const DC_CITIES = ['Hyderabad', 'Mumbai', 'Navi Mumbai', 'Pune', 'Chennai', 'New Delhi', 'Bengaluru', 'Ahmedabad', 'Kolkata', 'Noida'];
 
 // City footprint, per EVIO's "Data Centre Footprint Across India" slide (Oct 2026).
-// CtrlS Chandan Valley (Hyderabad) is left out until the contract is confirmed.
 export const DC_FOOTPRINT = [
     { city: 'Hyderabad', programmes: ['Microsoft HYD-01'], inProgress: false },
     { city: 'Mumbai & Navi Mumbai', programmes: ['NTT', 'CtrlS', 'AdaniConneX', 'Digital Edge'], inProgress: true },
