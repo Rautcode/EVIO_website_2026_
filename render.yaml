@@ -1,0 +1,63 @@
+# Render blueprint for the EVIO API (Express + SQLite).
+# Render dashboard → New → Blueprint → pick this repo. You'll be asked for the `sync: false` values.
+#
+# Why a paid plan + disk: Render's free tier wipes the filesystem on every restart/deploy,
+# which would delete the database (leads, job applications) and uploaded files.
+services:
+  - type: web
+    name: evio-api
+    runtime: node
+    rootDir: server
+    region: singapore          # closest Render region to India
+    plan: starter
+    buildCommand: npm ci
+    startCommand: node server.js
+    healthCheckPath: /healthz
+    disk:
+      name: evio-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: NODE_VERSION
+        value: "24"
+      - key: NODE_ENV
+        value: production
+      - key: DATA_DIR
+        value: /var/data
+      - key: JWT_SECRET
+        generateValue: true
+      # Requests arrive via Vercel's /api proxy, then Render's proxy: 2 hops to the real visitor IP
+      - key: TRUST_PROXY
+        value: "2"
+      - key: CORS_ORIGINS
+        value: https://evio-website-phi.vercel.app
+      # Password for the `admin` user, created on first start of an empty database
+      - key: ADMIN_PASSWORD
+        sync: false
+      # Email delivery (leads + job applications). Without these, data is still saved; emails are skipped.
+      - key: SMTP_HOST
+        value: smtp.gmail.com
+      - key: SMTP_PORT
+        value: "587"
+      - key: SMTP_SECURE
+        value: "false"
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
+      - key: SMTP_FROM_NAME
+        value: EVIO Website
+      - key: SMTP_DATACENTRE_EMAIL
+        sync: false
+      - key: SMTP_PROJECTS_EMAIL
+        value: projects@evio.in
+      - key: SMTP_AUTOMATION_EMAIL
+        value: automation@evio.in
+      - key: SMTP_HR_EMAIL
+        value: hr@evio.in
+      - key: SMTP_ENGINEERING_EMAIL
+        value: engineering_jobs@evio.in
+      - key: SMTP_MANAGEMENT_EMAIL
+        value: management@evio.in
+      - key: SMTP_OPERATIONS_EMAIL
+        value: operations@evio.in

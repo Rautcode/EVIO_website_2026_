@@ -3,7 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
 const multer = require('multer');
-const { db, initDb } = require('./database');
+const { db, initDb, DATA_DIR } = require('./database');
 const { sendMail, getLeadEmail, getCareersEmail } = require('./mailer');
 const fs = require('fs');
 const path = require('path');
@@ -34,14 +34,14 @@ const upload = multer({
     }
 });
 
-// Create temp directory for secure disk storage
-const tempDir = path.join(__dirname, 'temp');
+// Temp must sit on the same disk as uploads/: RFQ files are moved (renamed) from one to the other
+const tempDir = path.join(DATA_DIR, 'temp');
 if (!fs.existsSync(tempDir)) {
     fs.mkdirSync(tempDir, { recursive: true });
 }
 
 // RFQ attachments are kept here (linked from the lead) so they survive an SMTP failure
-const uploadsDir = path.join(__dirname, 'uploads');
+const uploadsDir = path.join(DATA_DIR, 'uploads');
 fs.mkdirSync(uploadsDir, { recursive: true });
 
 // RFQ Upload Configuration (Disk Storage)
@@ -117,6 +117,10 @@ initDb();
 // ==========================================
 // UTILITIES & CUSTOM MIDDLEWARE
 // ==========================================
+
+// Health check for the host (Render). Registered before the rate limiter so frequent
+// probes can never be throttled into a "service unhealthy" restart loop.
+app.get('/healthz', (req, res) => res.json({ ok: true }));
 
 // Rate limits (always on; see security.js)
 app.use('/api/', limits.api);

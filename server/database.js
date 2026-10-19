@@ -2,8 +2,13 @@ const { DatabaseSync } = require('node:sqlite');
 const path = require('path');
 const bcrypt = require('bcrypt');
 
+// All live data (database, uploads, temp) lives in DATA_DIR. On Render this is the
+// persistent disk (/var/data); locally it defaults to this folder.
+const DATA_DIR = process.env.DATA_DIR || __dirname;
+require('fs').mkdirSync(DATA_DIR, { recursive: true });
+
 // Initialize database
-const dbPath = path.join(__dirname, 'database.sqlite');
+const dbPath = path.join(DATA_DIR, 'database.sqlite');
 const db = new DatabaseSync(dbPath);
 db.exec('PRAGMA journal_mode = WAL');
 db.exec('PRAGMA busy_timeout = 5000');
@@ -186,5 +191,6 @@ const seedData = () => {
 
 module.exports = {
     db,
-    initDb
+    initDb,
+    DATA_DIR
 };
