@@ -166,6 +166,10 @@ const seedData = () => {
         // Never seed a password that is written in the source. Without ADMIN_PASSWORD we
         // generate one and print it once; change it after first login.
         let adminPass = process.env.ADMIN_PASSWORD;
+        if (adminPass && adminPass.length < 12) {
+            console.error('FATAL: ADMIN_PASSWORD must be at least 12 characters.');
+            process.exit(1);
+        }
         if (!adminPass) {
             adminPass = require('crypto').randomBytes(12).toString('base64url');
             console.warn(`⚠️  No ADMIN_PASSWORD set. Created admin user with one-time password: ${adminPass}`);
@@ -175,18 +179,8 @@ const seedData = () => {
         insertUser.run('admin', passwordHash);
     }
 
-    // Blogs: real posts migrated from evio.in (server/seed/blogPosts.json).
-    // Also removes the original placeholder posts from existing databases; admin-written posts are kept.
+    // Blog articles ship with the frontend (src/data/blogPosts.json); this table holds admin-written posts only.
     db.prepare("DELETE FROM blogs WHERE content = 'Full article content goes here.'").run();
-    const blogCount = db.prepare('SELECT COUNT(*) as count FROM blogs').get().count;
-    if (blogCount === 0) {
-        console.log('Seeding Blogs data...');
-        const insertBlog = db.prepare('INSERT INTO blogs (headline, category, readTime, date, excerpt, image, content) VALUES (?, ?, ?, ?, ?, ?, ?)');
-        // Oldest first, so the API's ORDER BY id DESC lists the newest post first
-        for (const b of [...require('./seed/blogPosts.json')].reverse()) {
-            insertBlog.run(b.headline, b.category, b.readTime, b.date, b.excerpt, b.image, b.content);
-        }
-    }
 };
 
 module.exports = {

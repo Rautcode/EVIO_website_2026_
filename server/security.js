@@ -35,7 +35,7 @@ const securityHeaders = (req, res, next) => {
 
 // ---------------------------------------------------------------- rate limiting
 // ponytail: in-memory, per process. Use Redis/Cloudflare if the API ever runs on several instances.
-const rateLimit = ({ windowMs, max, message }) => {
+const rateLimit = ({ windowMs, max, message, key = (req) => req.ip }) => {
     const hits = new Map();
     setInterval(() => {
         const cutoff = Date.now() - windowMs;
@@ -47,15 +47,15 @@ const rateLimit = ({ windowMs, max, message }) => {
 
     return (req, res, next) => {
         if (process.env.DISABLE_RATE_LIMIT === 'true' && !IS_PROD) return next();
-        const key = req.ip;
+        const k = key(req);
         const now = Date.now();
-        const recent = (hits.get(key) || []).filter(t => now - t < windowMs);
+        const recent = (hits.get(k) || []).filter(t => now - t < windowMs);
         if (recent.length >= max) {
             res.set('Retry-After', String(Math.ceil(windowMs / 1000)));
             return res.status(429).json({ error: message });
         }
         recent.push(now);
-        hits.set(key, recent);
+        hits.set(k, recent);
         next();
     };
 };
@@ -64,6 +64,10 @@ const limits = {
     api: rateLimit({ windowMs: 15 * 60_000, max: 300, message: 'Too many requests. Please try again in a few minutes.' }),
     forms: rateLimit({ windowMs: 15 * 60_000, max: 8, message: 'Too many submissions. Please try again in 15 minutes or call us directly.' }),
     login: rateLimit({ windowMs: 15 * 60_000, max: 5, message: 'Too many login attempts. Please try again in 15 minutes.' }),
+    // Site-wide caps. req.ip comes from X-Forwarded-For, which a caller hitting the Render URL directly
+    // (bypassing Vercel) can forge, so per-IP limits alone can't stop a distributed brute force or form flood.
+    loginGlobal: rateLimit({ windowMs: 15 * 60_000, max: 30, key: () => 'all', message: 'Login is temporarily locked. Please try again in 15 minutes.' }),
+    formsGlobal: rateLimit({ windowMs: 15 * 60_000, max: 150, key: () => 'all', message: 'We are receiving unusually many submissions. Please call us or try again shortly.' }),
 };
 
 // ---------------------------------------------------------------- form anti-spam
@@ -86,8 +90,9 @@ const spamGuard = (req, res, next) => {
     if (website) { reject(); console.warn('Spam blocked (honeypot)', req.ip, req.path); return res.json({ success: true }); }
 
     const [ts, sig] = String(formToken || '').split('.');
-    const valid = ts && sig && sig.length === 43 &&
-        crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(sign(ts)));
+    // Compare byte lengths first: timingSafeEqual throws on unequal lengths (e.g. multi-byte junk)
+    const got = Buffer.from(sig || ''), want = Buffer.from(sign(ts || ''));
+    const valid = ts && got.length === want.length && crypto.timingSafeEqual(got, want);
     if (!valid) { reject(); return res.status(400).json({ error: 'This form has expired. Please refresh the page and try again.' }); }
 
     const age = Date.now() - Number(ts);
@@ -100,7 +105,7 @@ const spamGuard = (req, res, next) => {
 const parseCookies = (header = '') => Object.fromEntries(
     header.split(';').map(c => c.trim()).filter(Boolean).map(c => {
         const i = c.indexOf('=');
-        return [c.slice(0, i), decodeURIComponent(c.slice(i + 1))];
+        try { return [c.slice(0, i), decodeURIComponent(c.slice(i + 1))]; } catch { return [c.slice(0, i), '']; } // malformed %-escape
     })
 );
 
@@ -118,11 +123,16 @@ const setSession = (res, user) => {
 
 const clearSession = (res) => res.clearCookie(SESSION_COOKIE, { path: '/api', httpOnly: true, secure: IS_PROD, sameSite: 'strict' });
 
+let userExists = () => false;
+const setUserLookup = (fn) => { userExists = fn; };
+
 const requireAdmin = (req, res, next) => {
     const token = parseCookies(req.headers.cookie)[SESSION_COOKIE];
     if (!token) return res.status(401).json({ error: 'Not signed in' });
     try {
         const claims = jwt.verify(token, JWT_SECRET, { algorithms: ['HS256'], issuer: ISSUER });
+        // A deleted admin account loses access immediately, not when its token expires
+        if (!userExists(Number(claims.sub))) throw new Error('user removed');
         req.admin = { id: Number(claims.sub), username: claims.username };
         next();
     } catch {
@@ -155,5 +165,5 @@ const clip = (v, max) => (v ?? '').toString().slice(0, max);
 
 module.exports = {
     JWT_SECRET, securityHeaders, limits, issueFormToken, spamGuard,
-    setSession, clearSession, requireAdmin, sameOriginWrites, errorHandler, clip,
+    setSession, clearSession, requireAdmin, setUserLookup, sameOriginWrites, errorHandler, clip,
 };

@@ -10,7 +10,7 @@ const path = require('path');
 const crypto = require('crypto');
 const {
     securityHeaders, limits, issueFormToken, spamGuard,
-    setSession, clearSession, requireAdmin, sameOriginWrites, errorHandler, clip,
+    setSession, clearSession, requireAdmin, setUserLookup, sameOriginWrites, errorHandler, clip,
 } = require('./security');
 
 // Multipart limits: one file, few short fields (blocks oversized/abusive form payloads)
@@ -88,8 +88,8 @@ app.set('trust proxy', trustProxy ? (Number.isNaN(Number(trustProxy)) ? trustPro
 
 // Secure CORS Origin Restrictions
 const allowedOrigins = [
-    'http://localhost:5173',
-    'http://localhost:5174',
+    // Dev servers only: in production a page on the visitor's own machine must not count as "our site"
+    ...(process.env.NODE_ENV === 'production' ? [] : ['http://localhost:5173', 'http://localhost:5174']),
     'https://evio.in',
     'https://www.evio.in',
     ...(process.env.CORS_ORIGINS || '').split(',').map(s => s.trim()).filter(Boolean)
@@ -113,6 +113,7 @@ app.use(sameOriginWrites(allowedOrigins));
 
 // Initialize Database
 initDb();
+setUserLookup((id) => !!db.prepare('SELECT 1 FROM users WHERE id = ?').get(id));
 
 // ==========================================
 // UTILITIES & CUSTOM MIDDLEWARE
@@ -150,7 +151,7 @@ const sendError = (res, err) => {
 // Same bcrypt cost as real hashes, so "unknown user" takes as long as "wrong password".
 const DUMMY_HASH = bcrypt.hashSync(crypto.randomBytes(16).toString('hex'), 10);
 
-app.post('/api/auth/login', limits.login, async (req, res) => {
+app.post('/api/auth/login', limits.login, limits.loginGlobal, async (req, res) => {
     try {
         const { username, password } = req.body || {};
         if (typeof username !== 'string' || typeof password !== 'string' || !password || password.length > 200) {
@@ -249,7 +250,7 @@ const sendLeadError = (res, err) =>
     err.status === 400 ? res.status(400).json({ error: err.message }) : sendError(res, err);
 
 // Public Endpoint - Simple lead (download gate, quick enquiries)
-app.post('/api/inquiries', limits.forms, spamGuard, async (req, res) => {
+app.post('/api/inquiries', limits.forms, limits.formsGlobal, spamGuard, async (req, res) => {
     try {
         const id = await saveLead({
             body: req.body,
@@ -262,7 +263,7 @@ app.post('/api/inquiries', limits.forms, spamGuard, async (req, res) => {
 });
 
 // Public Endpoint - Enterprise RFQ with Document Upload
-app.post('/api/rfq', limits.forms, rfqUpload.single('file'), spamGuard, async (req, res) => {
+app.post('/api/rfq', limits.forms, limits.formsGlobal, rfqUpload.single('file'), spamGuard, async (req, res) => {
     try {
         // Verify File Signature (Magic Numbers) if file exists
         if (req.file) {
@@ -305,7 +306,7 @@ app.post('/api/rfq', limits.forms, rfqUpload.single('file'), spamGuard, async (r
 // Saved to the DB (+ resume to uploads/) before emailing, so an SMTP failure never loses a candidate.
 const isPdfOrOffice = (buf) => ['25504446', 'D0CF11E0', '504B0304'].includes(buf.subarray(0, 4).toString('hex').toUpperCase());
 
-app.post('/api/applications', limits.forms, upload.single('resume'), spamGuard, async (req, res) => {
+app.post('/api/applications', limits.forms, limits.formsGlobal, upload.single('resume'), spamGuard, async (req, res) => {
     try {
         const raw = (v, max) => (v ?? '').toString().trim().slice(0, max);
         const a = {
