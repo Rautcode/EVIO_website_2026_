@@ -3,7 +3,11 @@ import { useParams, Link, Navigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import { projectsData } from '../data/projectsData';
-import { ArrowLeft, CheckCircle2, ChevronRight, HardHat, ShieldCheck, Zap } from 'lucide-react';
+import { testimonials } from '../data/testimonials';
+import { ArrowLeft, CheckCircle2, ChevronRight, HardHat, Quote, ShieldCheck, Zap } from 'lucide-react';
+
+// Snapshot values that mean "we don't know" are hidden rather than shown.
+const known = (v) => v && !/^(N\/A|-|Available on approval|Information available on approval)$/i.test(v);
 
 export const ProjectDetail = () => {
     const { projectId } = useParams();
@@ -15,6 +19,10 @@ export const ProjectDetail = () => {
     if (!project) {
         return <Navigate to="/projects" replace />;
     }
+
+    const letter = testimonials.find(t => t.client === project.testimonialClient);
+    const related = projectsData.filter(p => p.id !== project.id && p.sector === project.sector).slice(0, 3);
+    const snapshot = [['Capacity', project.capacity], ['EVIO Role', project.evioRole], ['Duration', project.duration]].filter(([, v]) => known(v));
 
     return (
         <div className="w-full flex flex-col min-h-screen bg-white selection:bg-evio-blue selection:text-white">
@@ -68,24 +76,18 @@ export const ProjectDetail = () => {
             </section>
 
             {/* Project Snapshot Bar */}
-            <div className="bg-white border-b border-evio-black/5 relative z-20 shadow-sm -mt-10 mx-6 md:mx-auto max-w-7xl rounded-2xl overflow-hidden">
-                <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-evio-black/5 divide-y md:divide-y-0">
-                    <div className="p-6">
-                        <p className="text-xs font-inter uppercase tracking-wider text-evio-black/50 mb-1">Capacity</p>
-                        <p className="font-syne font-bold text-evio-navy text-lg">{project.capacity}</p>
-                    </div>
-                    <div className="p-6">
-                        <p className="text-xs font-inter uppercase tracking-wider text-evio-black/50 mb-1">EVIO Role</p>
-                        <p className="font-syne font-bold text-evio-navy text-lg">{project.evioRole}</p>
-                    </div>
-                    <div className="p-6">
-                        <p className="text-xs font-inter uppercase tracking-wider text-evio-black/50 mb-1">Duration</p>
-                        <p className="font-syne font-bold text-evio-navy text-lg">{project.duration}</p>
-                    </div>
+            <div className="bg-white border-b border-evio-black/5 relative z-20 shadow-sm -mt-10 mx-6 md:mx-auto md:w-full max-w-7xl rounded-2xl overflow-hidden">
+                <div className="grid grid-cols-2 md:grid-flow-col md:auto-cols-fr divide-x divide-evio-black/5 divide-y md:divide-y-0">
+                    {snapshot.map(([label, value]) => (
+                        <div key={label} className="p-6">
+                            <p className="text-xs font-inter uppercase tracking-wider text-evio-black/50 mb-1">{label}</p>
+                            <p className="font-syne font-bold text-evio-navy text-lg">{value}</p>
+                        </div>
+                    ))}
                     <div className="p-6">
                         <p className="text-xs font-inter uppercase tracking-wider text-evio-black/50 mb-1">Verification</p>
                         <p className="font-syne font-bold text-green-600 flex items-center gap-2">
-                            <ShieldCheck size={18} /> Verified Data
+                            <ShieldCheck size={18} /> {letter ? 'Client letter on file' : 'Verified Data'}
                         </p>
                     </div>
                 </div>
@@ -98,6 +100,16 @@ export const ProjectDetail = () => {
                     {/* Main Content (Left) */}
                     <div className="lg:col-span-8 space-y-16">
                         
+                        {letter && (
+                            <figure className="bg-evio-navy text-white rounded-3xl p-8 md:p-10">
+                                <Quote className="text-evio-blue mb-4" size={32} />
+                                <blockquote className="font-inter text-lg leading-relaxed text-white/90 mb-6">{letter.quote}</blockquote>
+                                <figcaption className="font-inter text-sm text-white/60">
+                                    From the completion letter issued by <strong className="text-white">{letter.client}</strong>
+                                </figcaption>
+                            </figure>
+                        )}
+
                         {/* Scope of Work */}
                         <div>
                             <div className="flex items-center gap-4 mb-8">
@@ -117,7 +129,7 @@ export const ProjectDetail = () => {
                         </div>
 
                         {/* Engineering Challenge */}
-                        {project.challenges && project.challenges.length > 0 && (
+                        {project.challenges?.length > 0 && (
                             <div>
                                 <div className="flex items-center gap-4 mb-8">
                                     <div className="w-12 h-12 bg-evio-light-gray rounded-xl flex items-center justify-center text-red-500">
@@ -134,7 +146,7 @@ export const ProjectDetail = () => {
                         )}
 
                         {/* Execution Methodology */}
-                        {project.executionMethod && project.executionMethod.length > 0 && (
+                        {project.executionMethod?.length > 0 && (
                             <div>
                                 <h2 className="text-3xl font-syne font-bold text-evio-navy mb-8">Execution Methodology</h2>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -149,7 +161,7 @@ export const ProjectDetail = () => {
                         )}
                         
                         {/* Image Gallery */}
-                        {project.images && project.images.length > 1 && (
+                        {project.images?.length > 1 && (
                             <div>
                                 <h2 className="text-3xl font-syne font-bold text-evio-navy mb-8">Site Gallery</h2>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -172,7 +184,7 @@ export const ProjectDetail = () => {
                         <div className="sticky top-32 space-y-8">
                             
                             {/* Equipment Block */}
-                            <div className="bg-evio-light-gray p-8 rounded-3xl">
+                            {project.equipment?.length > 0 && <div className="bg-evio-light-gray p-8 rounded-3xl">
                                 <h3 className="font-syne font-bold text-xl text-evio-navy mb-6">Major Equipment</h3>
                                 <ul className="space-y-3">
                                     {project.equipment.map((eq, index) => (
@@ -182,10 +194,10 @@ export const ProjectDetail = () => {
                                         </li>
                                     ))}
                                 </ul>
-                            </div>
+                            </div>}
 
                             {/* Tech/Integration Block */}
-                            {project.technologies && project.technologies.length > 0 && (
+                            {project.technologies?.length > 0 && (
                                 <div className="bg-evio-light-gray p-8 rounded-3xl">
                                     <h3 className="font-syne font-bold text-xl text-evio-navy mb-6">Technologies & Systems</h3>
                                     <div className="flex flex-wrap gap-2">
@@ -221,6 +233,23 @@ export const ProjectDetail = () => {
                     </div>
                 </div>
             </section>
+
+            {related.length > 0 && (
+                <section className="pb-24 px-6">
+                    <div className="max-w-7xl mx-auto">
+                        <h2 className="text-3xl font-syne font-bold text-evio-navy mb-8">More {project.sector.toLowerCase()} projects</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            {related.map(r => (
+                                <Link key={r.id} to={`/projects/${r.id}`} className="group p-6 border border-evio-black/10 rounded-2xl hover:border-evio-blue/40 hover:shadow-lg transition-all">
+                                    <p className="text-xs font-inter font-bold text-evio-blue uppercase tracking-widest mb-2">{r.client}</p>
+                                    <h3 className="font-syne font-bold text-lg text-evio-navy mb-2 group-hover:text-evio-blue transition-colors">{r.projectName}</h3>
+                                    <p className="font-inter text-sm text-evio-black/60">{r.location}</p>
+                                </Link>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            )}
         </div>
     );
 };

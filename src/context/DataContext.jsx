@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect, useCallback } from 'react';
+import staticPosts from '../data/blogPosts.json';
 
 export const DataContext = createContext();
 
@@ -16,7 +17,8 @@ const initialDownloadCategories = [
 export const DataProvider = ({ children }) => {
     const [jobs, setJobs] = useState([]);
     const [csrInitiatives, setCsrInitiatives] = useState([]);
-    const [blogPosts, setBlogPosts] = useState([]);
+    // Articles ship with the site (pre-rendered, work without the API); admin-written posts are added from the API.
+    const [blogPosts, setBlogPosts] = useState(staticPosts);
     const [inquiries, setInquiries] = useState([]);
     
     const [applications, setApplications] = useState([]);
@@ -47,7 +49,9 @@ export const DataProvider = ({ children }) => {
                 // Fetch Blogs
                 const resBlog = await fetch('/api/blogs');
                 const dataBlog = await resBlog.json();
-                setBlogPosts(dataBlog);
+                // ponytail: older databases still hold seeded copies of the static posts; dedupe by title
+                const titles = new Set(staticPosts.map(p => p.title));
+                setBlogPosts([...dataBlog.filter(p => !titles.has(p.title)), ...staticPosts]);
 
             } catch (err) {
                 console.error("Failed to fetch data from backend API:", err);

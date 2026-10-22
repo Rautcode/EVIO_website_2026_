@@ -2,34 +2,35 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { DC_PROGRAMMES } from '../../data/dataCentresData';
+import { projectsData } from '../../data/projectsData';
 
 // ponytail: no site photo per data centre programme yet; cards show the plain EVIO block until supplied
 const DC_IMAGES = {};
 
-const projects = [
+const listed = [
     // Data centre programmes come from the shared data file (also used by /data-centres)
     ...DC_PROGRAMMES.map(p => ({
         id: p.id, client: p.client, projectName: `${p.capacity.split(' (')[0]} Data Centre Electrical Works`,
         location: p.location, sector: "Data Centers", facilityType: `Data Centre · ${p.status}`,
         capacity: p.capacity, evioRole: "HT/LT Electrical", scope: [],
-        images: DC_IMAGES[p.id] ? [DC_IMAGES[p.id]] : [], publicStatus: true, hasDetail: !!p.hasDetail
+        images: DC_IMAGES[p.id] ? [DC_IMAGES[p.id]] : [], publicStatus: true
     })),
     { 
-        id: "3", client: "Yokohama", projectName: "Plant Expansion HT/LT Setup", 
+        id: "yokohama-bahadurgarh", client: "Yokohama", projectName: "Plant Expansion HT/LT Setup", 
         location: "Bahadurgarh", sector: "Manufacturing", facilityType: "Manufacturing Plant", 
         capacity: "6.6KV Downstream", evioRole: "Turnkey Electrical", 
         scope: ["Supply", "Installation", "Commissioning"], 
         images: ["/images/projects/real/yokohama.jpg"], publicStatus: true, span: "col-span-1 row-span-1" 
     },
     { 
-        id: "4", client: "Nirma Ltd.", projectName: "Caustic Soda Plant Turnkey", 
+        id: "nirma-bhavnagar", client: "Nirma Ltd.", projectName: "Caustic Soda Plant Turnkey", 
         location: "Bhavnagar, Gujarat", sector: "Chemical", facilityType: "Chemical Plant", 
         capacity: "60 TPD", evioRole: "Turnkey Execution", 
         scope: ["Electrical", "Automation"], 
         images: ["/images/projects/real/nirma.jpg"], publicStatus: true, span: "col-span-1 row-span-2" 
     },
     { 
-        id: "5", client: "CEAT Ltd.", projectName: "Radial Tyre Plant Expansion", 
+        id: "ceat-halol", client: "CEAT Ltd.", projectName: "Radial Tyre Plant Expansion", 
         location: "Halol, Gujarat", sector: "Manufacturing", facilityType: "Tyre Plant", 
         capacity: "165 to 250 MTPD", evioRole: "Testing & Commissioning", 
         scope: ["Equipment Testing", "Commissioning"], 
@@ -38,21 +39,20 @@ const projects = [
     { 
         id: "flipkart-haringhata", client: "Flipkart", projectName: "Logistics Hub Electrification", 
         location: "West Bengal", sector: "Infrastructure", facilityType: "Warehouse / Logistics", 
-        capacity: "Large Scale", evioRole: "Electrical", 
+        capacity: "5 million sq ft", evioRole: "Electrical EPC", 
         scope: ["HT/LT Installation", "Lighting", "Power Distribution"], 
-        images: ["/images/projects/real/flipkart.jpg"], publicStatus: true, span: "col-span-1 row-span-1",
-        hasDetail: true
+        images: ["/images/projects/real/flipkart.jpg"], publicStatus: true, span: "col-span-1 row-span-1"
     },
     { 
-        id: "7", client: "IIT Hyderabad", projectName: "Campus Electrification", 
+        id: "iit-hyderabad-package-3b", client: "IIT Hyderabad", projectName: "Campus Electrification", 
         location: "Hyderabad", sector: "Commercial", facilityType: "Education Institute", 
         capacity: "Campus Wide", evioRole: "Electrical Infrastructure", 
         scope: ["HT Distribution", "LT Panels", "Internal Electrification"], 
         images: ["/images/projects/real/iit-hyderabad.jpg"], publicStatus: true, span: "col-span-1 row-span-1" 
     },
     { 
-        id: "8", client: "The Leela", projectName: "Hotel Lighting Automation", 
-        location: "Chennai", sector: "Commercial", facilityType: "Hospitality", 
+        id: "leela-palace-gandhinagar", client: "The Leela", projectName: "Hotel Lighting Automation", 
+        location: "Gandhinagar", sector: "Commercial", facilityType: "Hospitality", 
         capacity: "Full Property", evioRole: "Lighting Automation", 
         scope: ["DALI Integration", "Scene Setting", "Dimming Controls"], 
         images: ["/images/projects/real/leela.jpg"], publicStatus: true, span: "col-span-1 md:col-span-2 row-span-1" 
@@ -65,18 +65,25 @@ const projects = [
     { id: "14", client: "Kidzania", projectName: "Electrical Installation", location: "Noida", sector: "Commercial", facilityType: "Entertainment", capacity: "-", evioRole: "Electrical", scope: ["Electrical Installation"], images: ["/images/projects/real/kidzania.jpg"], publicStatus: true, span: "col-span-1 row-span-1" },
     { id: "15", client: "Odisha Secretariat", projectName: "Secretariat Electrical", location: "Bhubaneswar", sector: "Infrastructure", facilityType: "Government", capacity: "-", evioRole: "Electrical", scope: ["Electrical Works"], images: ["/images/projects/real/odisha-secretariat.jpg"], publicStatus: true, span: "col-span-1 row-span-1" },
     { id: "16", client: "Biocon", projectName: "Electrical Setup", location: "India", sector: "Pharmaceuticals", facilityType: "Facility", capacity: "-", evioRole: "Electrical", scope: ["Electrical Setup"], images: ["/images/projects/real/biocon.jpg"], publicStatus: true, span: "col-span-1 row-span-1" },
-    { id: "ineos-styrolution", client: "Ineos", projectName: "66kV Switchyard", location: "India", sector: "Plastics", facilityType: "Plant", capacity: "66kV", evioRole: "Switchyard", scope: ["66kV Switchyard"], images: ["/images/projects/real/ineos.jpg"], publicStatus: true, span: "col-span-1 row-span-1", hasDetail: true },
-    { id: "hccb-multi-site", client: "HCCB", projectName: "Electrical / CCTV / Access", location: "Khurda", sector: "FMCG", facilityType: "Facility", capacity: "-", evioRole: "Electrical & Security", scope: ["Electrical", "CCTV", "Access Control"], images: ["/images/projects/real/hccb.jpg"], publicStatus: true, span: "col-span-1 row-span-1", hasDetail: true },
+    { id: "ineos-styrolution", client: "Ineos", projectName: "66kV Switchyard", location: "India", sector: "Plastics", facilityType: "Plant", capacity: "66kV", evioRole: "Switchyard", scope: ["66kV Switchyard"], images: ["/images/projects/real/ineos.jpg"], publicStatus: true, span: "col-span-1 row-span-1" },
+    { id: "hccb-multi-site", client: "HCCB", projectName: "Electrical / CCTV / Access", location: "Khurda", sector: "FMCG", facilityType: "Facility", capacity: "-", evioRole: "Electrical & Security", scope: ["Electrical", "CCTV", "Access Control"], images: ["/images/projects/real/hccb.jpg"], publicStatus: true, span: "col-span-1 row-span-1" },
     { id: "19", client: "Escientia Advanced Sciences", projectName: "Electrical / Instrumentation", location: "Vishakapatnam", sector: "Pharmaceuticals", facilityType: "Facility", capacity: "-", evioRole: "Electrical & Instrumentation", scope: ["Electrical", "Instrumentation"], images: ["/images/projects/real/escientia.jpg"], publicStatus: true, span: "col-span-1 row-span-1" },
     { id: "20", client: "Elementis", projectName: "Electrical / Instrumentation", location: "India", sector: "Chemical", facilityType: "Facility", capacity: "-", evioRole: "Electrical & Instrumentation", scope: ["Electrical", "Instrumentation"], images: ["/images/projects/real/elementis.jpg"], publicStatus: true, span: "col-span-1 row-span-1" },
-    { id: "bpcl-bargarh", client: "BPCL", projectName: "Bargarh Biorefinery Electrification", location: "Bargarh", sector: "Industrial", facilityType: "Biorefinery", capacity: "-", evioRole: "Electrical Execution", scope: ["33kV/6.6kV Switchyard"], images: [], publicStatus: true, span: "col-span-1 row-span-1", hasDetail: true },
+    { id: "bpcl-bargarh", client: "BPCL", projectName: "Bargarh Biorefinery Electrification", location: "Bargarh", sector: "Industrial", facilityType: "Biorefinery", capacity: "-", evioRole: "Electrical Execution", scope: ["33kV/6.6kV Switchyard"], images: [], publicStatus: true, span: "col-span-1 row-span-1" },
     { id: "21", client: "Dandi Kutir Museum", projectName: "Lighting Automation", location: "Gandhinagar", sector: "Commercial", facilityType: "Museum", capacity: "-", evioRole: "Lighting Automation", scope: ["Lighting Automation"], images: ["/images/projects/real/dandi-kutir.jpg"], publicStatus: true, span: "col-span-1 row-span-1" },
     { id: "22", client: "Cummins", projectName: "Electrical / ELV", location: "Pune", sector: "Automobile & Ancillary", facilityType: "Facility", capacity: "-", evioRole: "Electrical / ELV", scope: ["Electrical", "ELV"], images: ["/images/projects/real/cummins.jpg"], publicStatus: true, span: "col-span-1 row-span-1" },
-    { id: "24", client: "Myntra", projectName: "Embassy Industrial Park Electrical Works", location: "India", sector: "Commercial", facilityType: "Industrial Park", capacity: "-", evioRole: "Turnkey Electrical", scope: ["Turnkey Electrical"], images: ["/images/projects/real/myntra.jpg"], publicStatus: true },
+    { id: "myntra-embassy-bilaspur", client: "Myntra", projectName: "Embassy Industrial Park Electrical Works", location: "Bilaspur, NCR", sector: "Commercial", facilityType: "Industrial Park", capacity: "-", evioRole: "Turnkey Electrical", scope: ["Turnkey Electrical"], images: ["/images/projects/real/myntra.jpg"], publicStatus: true },
     { id: "25", client: "Lodha", projectName: "Electrical / ELV", location: "India", sector: "Commercial", facilityType: "Real Estate", capacity: "-", evioRole: "Electrical / ELV", scope: ["Electrical / ELV"], images: ["/images/projects/real/lodha.jpg"], publicStatus: true },
     { id: "26", client: "JIO", projectName: "Electrical / ELV", location: "India", sector: "Commercial", facilityType: "Facility", capacity: "-", evioRole: "Electrical / ELV", scope: ["Electrical / ELV"], images: ["/images/projects/real/jio.jpg"], publicStatus: true },
     { id: "27", client: "Jio Garden", projectName: "Electrical / ELV", location: "India", sector: "Commercial", facilityType: "Venue", capacity: "-", evioRole: "Electrical / ELV", scope: ["Electrical / ELV"], images: ["/images/projects/real/jio-garden.jpg"], publicStatus: true },
     { id: "23", client: "Mazak", projectName: "Electrical Setup", location: "Pune", sector: "Engineering", facilityType: "Facility", capacity: "-", evioRole: "Electrical", scope: ["Electrical Installation"], images: ["/images/projects/real/mazak.jpg"], publicStatus: true, span: "col-span-1 row-span-1" }
+];
+
+// Any card with a case study in projectsData links to it; case studies without a card are appended.
+const caseStudyIds = new Set(projectsData.map(p => p.id));
+const projects = [
+    ...listed.map(p => ({ ...p, hasDetail: caseStudyIds.has(p.id) })),
+    ...projectsData.filter(d => !listed.some(p => p.id === d.id)).map(d => ({ ...d, hasDetail: true })),
 ];
 
 const categories = ['All', 'Data Centers', 'Manufacturing', 'Chemical', 'Infrastructure', 'Commercial', 'Pharmaceuticals', 'Plastics', 'FMCG', 'Automobile & Ancillary', 'Engineering'];

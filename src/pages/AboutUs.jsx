@@ -64,10 +64,11 @@ export const AboutUs = () => {
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                 </svg>
                             </div>
-                            <h4 className="font-syne font-bold text-lg text-white mb-2">Our Strategy</h4>
-                            <p className="text-xs text-white/80 font-inter leading-relaxed">
-                                "EVIO is the preferred partner for integrated Electrical, Instrumentation, and Automation solutions across Industry and building customer segments, collaborating with top global brands."
+                            <h4 className="font-syne font-bold text-lg text-white mb-2">Strategy &amp; Vision</h4>
+                            <p className="text-[11px] text-white/80 font-inter leading-relaxed">
+                                "EVIO is the partner of choice for combination of Electrical and Automation solutions in specific Industry and Building customer segments in collaboration with the best global brands. Our community of experts with deep domain knowledge and high customer focus as our core values creates EVIO as a brand that is trusted and dependable for challenging Electrical and Automation projects."
                             </p>
+                            <p className="text-[10px] font-inter mt-3 text-white/50">Prashant G. Kandoi, Managing Director</p>
                         </div>
 
                         {/* Quality Policy */}
@@ -92,8 +93,9 @@ export const AboutUs = () => {
                             </div>
                             <h4 className="font-syne font-bold text-lg text-evio-navy mb-2">HSE Policy</h4>
                             <p className="text-[11px] text-evio-black/80 font-inter leading-relaxed">
-                                "The Health and Safety of our people takes precedence. We are dedicated to safeguarding our people, customer's property, and subcontractors from accidents, injuries, or damages. Environmental protection is integral to our operations. Zero accident policy is maintained across all projects."
+                                "At EVIO, Health and Safety of its Employees is our primary concern and precedes other business objectives. We are committed to the protection of our employees, workers, customer's property and sub-contractors from accidents, injury or damage, and we will constantly strive for 'ZERO ACCIDENT'. In case of any incident, as minor as it may be, we will report the same immediately and take responsible actions instantly."
                             </p>
+                            <p className="text-[10px] font-inter mt-3 text-evio-black/50">Prashant G. Kandoi, Managing Director · 10 Feb 2023</p>
                         </div>
                     </div>
                 </div>
