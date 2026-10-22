@@ -5,6 +5,7 @@ const bcrypt = require('bcrypt');
 const multer = require('multer');
 const { db, initDb, DATA_DIR } = require('./database');
 const { sendMail, getLeadEmail, getCareersEmail } = require('./mailer');
+const { notifyWhatsApp } = require('./whatsapp');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
@@ -221,6 +222,8 @@ const saveLead = async ({ body, emailSubject, extraHtml = '', file }) => {
         throw err;
     }
     const attachments = file ? [{ filename: file.originalname, path: attachmentPath }] : [];
+    // Not awaited: the visitor's response shouldn't wait on Meta. notifyWhatsApp never throws.
+    notifyWhatsApp(lead).catch(() => {}); // belt and braces: an unhandled rejection would crash the process
 
     try {
         await sendMail({

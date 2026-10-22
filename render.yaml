@@ -61,3 +61,13 @@ services:
         value: management@evio.in
       - key: SMTP_OPERATIONS_EMAIL
         value: operations@evio.in
+      # Instant WhatsApp alert for every new lead (see server/whatsapp.js). Leave unset to disable.
+      - key: WHATSAPP_TOKEN
+        sync: false
+      - key: WHATSAPP_PHONE_ID
+        sync: false
+      # Comma-separated numbers with country code, e.g. 919876543210,919812345678
+      - key: WHATSAPP_ALERT_TO
+        sync: false
+      - key: WHATSAPP_TEMPLATE
+        value: new_lead
