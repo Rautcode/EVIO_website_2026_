@@ -11,17 +11,7 @@ export const DC_HEADLINE_STATS = [
 
 export const DC_CITIES = ['Hyderabad', 'Mumbai', 'Navi Mumbai', 'Pune', 'Chennai', 'New Delhi', 'Bengaluru', 'Ahmedabad', 'Kolkata', 'Noida'];
 
-// City footprint, per EVIO's "Data Centre Footprint Across India" slide (Oct 2026).
-export const DC_FOOTPRINT = [
-    { city: 'Hyderabad', programmes: ['Microsoft HYD-01'], inProgress: false },
-    { city: 'Mumbai & Navi Mumbai', programmes: ['NTT', 'CtrlS', 'AdaniConneX', 'Digital Edge'], inProgress: true },
-    { city: 'Pune', programmes: ['ST Telemedia', 'AdaniConneX'], inProgress: true },
-    { city: 'Delhi NCR', programmes: ['ST Telemedia (New Delhi)', 'Sify (Noida)'], inProgress: false },
-    { city: 'Ahmedabad', programmes: ['ST Telemedia'], inProgress: false },
-    { city: 'Bengaluru', programmes: ['ST Telemedia'], inProgress: false },
-    { city: 'Chennai', programmes: ['ST Telemedia'], inProgress: false },
-    { city: 'Kolkata', programmes: ['NTT'], inProgress: false },
-];
+// City footprint (map on /data-centres) lives in projectMap.js -> DC_MAP_CITIES.
 
 // Shown on the page and merged into the Projects gallery (sector "Data Centers").
 export const DC_PROGRAMMES = [

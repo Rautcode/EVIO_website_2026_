@@ -1,6 +1,7 @@
 import { Helmet } from 'react-helmet-async';
 import { ProjectsHero } from '../components/projects/ProjectsHero';
 import { ProjectGalleryGrid } from '../components/projects/ProjectGalleryGrid';
+import { ProjectMap } from '../components/projects/ProjectMap';
 
 export const ProjectsGallery = () => {
     return (
@@ -11,6 +12,7 @@ export const ProjectsGallery = () => {
             </Helmet>
             
             <ProjectsHero />
+            <ProjectMap />
             <ProjectGalleryGrid />
         </div>
     );

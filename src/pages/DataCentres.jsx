@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
+import { ProjectMap } from '../components/projects/ProjectMap';
+import { DC_MAP_CITIES } from '../data/projectMap';
 import { motion } from 'framer-motion';
 import { Zap, Cable, Fuel, BatteryCharging, Rows3, ShieldCheck, ClipboardCheck, Truck, ArrowRight, MapPin, HardHat, Download } from 'lucide-react';
 import {
-    DC_HEADLINE_STATS, DC_CITIES, DC_FOOTPRINT, DC_PROGRAMMES, DC_CAPABILITIES, DC_QA_STEPS, SAFETY_BY_YEAR,
+    DC_HEADLINE_STATS, DC_CITIES, DC_PROGRAMMES, DC_CAPABILITIES, DC_QA_STEPS, SAFETY_BY_YEAR,
 } from '../data/dataCentresData';
 
 const CAPABILITY_ICONS = [Zap, Cable, Fuel, BatteryCharging, Rows3, ShieldCheck, ClipboardCheck, Truck];
@@ -99,35 +101,10 @@ export const DataCentres = () => {
             </section>
 
             {/* Footprint */}
-            <section className="pb-24 px-6">
-                <div className="max-w-6xl mx-auto">
-                    <SectionTitle eyebrow="Pan-India footprint" title="Data centre footprint across India">
-                        {`7 data centre clients across ${DC_CITIES.length} cities: 4 programmes completed, 3 in progress.`}
-                    </SectionTitle>
-                    <div className="rounded-2xl overflow-hidden border border-evio-black/10">
-                        <table className="w-full font-inter text-left">
-                            <thead className="bg-evio-navy text-white">
-                                <tr><th className="px-5 py-4 font-bold">City</th><th className="px-5 py-4 font-bold">Data centre programmes</th></tr>
-                            </thead>
-                            <tbody>
-                                {DC_FOOTPRINT.map((row, i) => (
-                                    <tr key={row.city} className={i % 2 ? 'bg-evio-light-gray' : 'bg-white'}>
-                                        <td className="px-5 py-4 font-bold text-evio-navy align-top">
-                                            <span className={`inline-block w-2.5 h-2.5 rounded-full mr-3 ${row.inProgress ? 'bg-amber-500' : 'bg-evio-blue'}`} aria-hidden="true" />
-                                            {row.city}
-                                        </td>
-                                        <td className="px-5 py-4 text-evio-black/70">{row.programmes.join(' · ')}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                    <p className="mt-4 text-sm font-inter text-evio-black/50 flex flex-wrap gap-x-6 gap-y-1">
-                        <span><span className="inline-block w-2.5 h-2.5 rounded-full bg-evio-blue mr-2" />Completed</span>
-                        <span><span className="inline-block w-2.5 h-2.5 rounded-full bg-amber-500 mr-2" />Includes work in progress</span>
-                    </p>
-                </div>
-            </section>
+            <ProjectMap
+                cities={DC_MAP_CITIES} unmapped={[]} refPrefix="dc-map" className="pb-24 px-6"
+                eyebrow="Pan-India footprint" title="Data centre footprint across India"
+            />
 
             {/* 4. Capabilities */}
             <section className="py-24 px-6 bg-evio-light-gray">
