@@ -88,7 +88,7 @@ export const CSRInitiatives = () => {
                                                 {item.category}
                                             </span>
                                         </div>
-                                        <img src={item.image} alt={item.title} className="absolute inset-0 w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700" />
+                                        {item.image && <img src={item.image} alt={item.title} className="absolute inset-0 w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700" />}
                                     </div>
                                     <div className="p-6 md:p-8 flex flex-col flex-grow">
                                         <p className="text-xs font-inter text-evio-black/40 mb-2">{item.date}</p>

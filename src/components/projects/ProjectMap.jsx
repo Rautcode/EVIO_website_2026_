@@ -14,9 +14,11 @@ export const ProjectMap = ({
     cities = MAP_CITIES, unmapped = UNMAPPED_PROJECTS, refPrefix = 'map',
     eyebrow = 'Pan-India Footprint', title = 'Selected projects across India', className = 'py-24 px-6 bg-white',
 }) => {
-    const [active, setActive] = useState(cities[0]);
+    // Kept by name: `cities` is rebuilt when admin-added case studies load
+    const [activeName, setActiveName] = useState(cities[0].city);
+    const active = cities.find(c => c.city === activeName) || cities[0];
 
-    const select = (c) => { setActive(c); track('map_city', { city: c.city }); };
+    const select = (c) => { setActiveName(c.city); track('map_city', { city: c.city }); };
 
     return (
         <section className={className}>

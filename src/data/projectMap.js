@@ -1,6 +1,8 @@
 // Cities on the /projects map. `to` links to a case study, the data centre page or the gallery.
 // Only projects already published elsewhere on the site belong here.
 
+import { INDIA_CITIES } from './indiaCities';
+
 const cs = (id) => `/projects/${id}`;
 const DC = '/data-centres';
 
@@ -100,3 +102,19 @@ export const DC_MAP_CITIES = [
     { city: 'Chennai', lat: 13.08, lon: 80.27, projects: [{ name: 'ST Telemedia GDC', to: cs('stt-gdc-india') }] },
     { city: 'Kolkata', lat: 22.57, lon: 88.36, projects: [{ name: 'NTT DATA' }] },
 ];
+
+// Adds case studies created in the admin panel to the /projects map: pinned by `mapCity`,
+// otherwise listed under the map. Returns new arrays; the inputs are not changed.
+export const withAdminProjects = (projects = []) => {
+    const cities = MAP_CITIES.map(c => ({ ...c, projects: [...c.projects] }));
+    const unmapped = [...UNMAPPED_PROJECTS];
+    for (const p of projects) {
+        const name = `${p.client}: ${p.projectName}`;
+        let city = cities.find(c => c.city === p.mapCity);
+        const known = !city && INDIA_CITIES.find(c => c.city === p.mapCity);
+        if (known) cities.push(city = { ...known, projects: [] });
+        if (city) city.projects.push({ name, to: cs(p.id) });
+        else unmapped.push(name);
+    }
+    return { cities, unmapped };
+};

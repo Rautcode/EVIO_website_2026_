@@ -1,9 +1,10 @@
-import { useEffect } from 'react';
+import { useContext, useEffect } from 'react';
 import { useParams, Link, Navigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import { projectsData } from '../data/projectsData';
 import { testimonials } from '../data/testimonials';
+import { DataContext } from '../context/DataContext';
 import { ArrowLeft, CheckCircle2, ChevronRight, HardHat, Quote, ShieldCheck, Zap } from 'lucide-react';
 
 // Snapshot values that mean "we don't know" are hidden rather than shown.
@@ -11,24 +12,28 @@ const known = (v) => v && !/^(N\/A|-|Available on approval|Information available
 
 export const ProjectDetail = () => {
     const { projectId } = useParams();
-    // Static data: derive directly instead of copying into state (no loading flash)
-    const project = projectsData.find(p => p.id === projectId);
+    // Built-in case studies render at once; ones added in the admin panel arrive from the API
+    const { dbProjects } = useContext(DataContext);
+    const all = [...projectsData, ...(dbProjects || []).filter(d => !projectsData.some(p => p.id === d.id))];
+    const project = all.find(p => p.id === projectId);
 
     useEffect(() => { window.scrollTo(0, 0); }, [projectId]);
 
     if (!project) {
-        return <Navigate to="/projects" replace />;
+        return dbProjects === null
+            ? <div className="min-h-[60vh] flex items-center justify-center font-inter text-evio-black/50">Loading…</div>
+            : <Navigate to="/projects" replace />;
     }
 
     const letter = testimonials.find(t => t.client === project.testimonialClient);
-    const related = projectsData.filter(p => p.id !== project.id && p.sector === project.sector).slice(0, 3);
+    const related = all.filter(p => p.id !== project.id && p.sector === project.sector).slice(0, 3);
     const snapshot = [['Capacity', project.capacity], ['EVIO Role', project.evioRole], ['Duration', project.duration]].filter(([, v]) => known(v));
 
     return (
         <div className="w-full flex flex-col min-h-screen bg-white selection:bg-evio-blue selection:text-white">
             <Helmet>
                 <title>{`${project.projectName} | ${project.client} | EVIO`}</title>
-                <meta name="description" content={`EVIO executed the ${project.contractType} for ${project.client}'s ${project.facilityType} in ${project.location}. Scope included: ${project.scope.join(', ')}.`} />
+                <meta name="description" content={`EVIO executed the ${project.contractType} for ${project.client}'s ${project.facilityType} in ${project.location}. Scope included: ${(project.scope || []).join(', ')}.`} />
                 <meta property="og:title" content={`${project.projectName} - EVIO Case Study`} />
                 <meta property="og:description" content={`Read the technical execution case study for ${project.client}.`} />
             </Helmet>
@@ -119,7 +124,7 @@ export const ProjectDetail = () => {
                                 <h2 className="text-3xl font-syne font-bold text-evio-navy">Scope of Work</h2>
                             </div>
                             <ul className="space-y-4">
-                                {project.scope.map((item, index) => (
+                                {(project.scope || []).map((item, index) => (
                                     <li key={index} className="flex items-start gap-4 p-4 bg-evio-light-gray rounded-xl">
                                         <CheckCircle2 className="text-evio-blue flex-shrink-0 mt-1" size={20} />
                                         <span className="font-inter text-evio-black/80">{item}</span>
@@ -217,7 +222,7 @@ export const ProjectDetail = () => {
                                     Execution Outcome
                                 </h3>
                                 <ul className="space-y-4">
-                                    {project.outcomes.map((outcome, index) => (
+                                    {(project.outcomes || []).map((outcome, index) => (
                                         <li key={index} className="font-inter text-sm text-white/80 border-b border-white/10 pb-4 last:border-0 last:pb-0">
                                             {outcome}
                                         </li>

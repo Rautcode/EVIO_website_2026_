@@ -20,6 +20,8 @@ export const DataProvider = ({ children }) => {
     // Articles ship with the site (pre-rendered, work without the API); admin-written posts are added from the API.
     const [blogPosts, setBlogPosts] = useState(staticPosts);
     const [inquiries, setInquiries] = useState([]);
+    // Case studies added in the admin panel (null until loaded; the built-in ones are in projectsData.js)
+    const [dbProjects, setDbProjects] = useState(null);
     
     const [applications, setApplications] = useState([]);
     
@@ -59,6 +61,7 @@ export const DataProvider = ({ children }) => {
         };
 
         loadFromAPI();
+        fetch('/api/projects').then(r => r.ok ? r.json() : []).catch(() => []).then(setDbProjects);
         // Old builds kept the admin token in localStorage; sessions are HttpOnly cookies now.
         try { localStorage.removeItem('evio_admin_token'); } catch { /* storage blocked */ }
     }, []);
@@ -153,9 +156,11 @@ export const DataProvider = ({ children }) => {
                 headers: getAuthHeaders(),
                 body: JSON.stringify(newBlogData)
             });
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
             const dbBlog = await res.json();
-            setBlogPosts([...blogPosts, dbBlog]);
-        } catch (err) { console.error(err); }
+            setBlogPosts(prev => [dbBlog, ...prev]);
+            return dbBlog;
+        } catch (err) { console.error(err); return null; }
     };
 
     const apiDeleteBlog = async (id) => {
@@ -225,6 +230,7 @@ export const DataProvider = ({ children }) => {
             csrInitiatives, 
             addCsr: apiAddCsr, 
             deleteCsr: apiDeleteCsr,
+            dbProjects,
             blogPosts, 
             addBlog: apiAddBlog, 
             deleteBlog: apiDeleteBlog,

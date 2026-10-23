@@ -1,9 +1,14 @@
+import { useContext } from 'react';
 import { Helmet } from 'react-helmet-async';
+import { DataContext } from '../context/DataContext';
+import { withAdminProjects } from '../data/projectMap';
 import { ProjectsHero } from '../components/projects/ProjectsHero';
 import { ProjectGalleryGrid } from '../components/projects/ProjectGalleryGrid';
 import { ProjectMap } from '../components/projects/ProjectMap';
 
 export const ProjectsGallery = () => {
+    const { dbProjects } = useContext(DataContext);
+    const { cities, unmapped } = withAdminProjects(dbProjects || []);
     return (
         <div className="w-full flex flex-col min-h-screen bg-evio-light-gray">
             <Helmet>
@@ -12,7 +17,7 @@ export const ProjectsGallery = () => {
             </Helmet>
             
             <ProjectsHero />
-            <ProjectMap />
+            <ProjectMap cities={cities} unmapped={unmapped} />
             <ProjectGalleryGrid />
         </div>
     );

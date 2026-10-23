@@ -11,7 +11,7 @@ const path = require('path');
 const crypto = require('crypto');
 const {
     securityHeaders, limits, issueFormToken, spamGuard,
-    setSession, clearSession, requireAdmin, setUserLookup, sameOriginWrites, errorHandler, clip,
+    setSession, clearSession, requireAdmin, requireRole, setUserLookup, sameOriginWrites, errorHandler, clip,
 } = require('./security');
 
 // Multipart limits: one file, few short fields (blocks oversized/abusive form payloads)
@@ -115,7 +115,8 @@ app.use(sameOriginWrites(allowedOrigins));
 // Initialize Database
 initDb();
 setUserLookup((id) => db.prepare('SELECT * FROM users WHERE id = ?').get(id));
-require('./admin').registerAdminRoutes(app);
+const { registerAdminRoutes, audit } = require('./admin');
+registerAdminRoutes(app);
 require('./ai').registerAiRoutes(app);
 
 // ==========================================
@@ -378,7 +379,7 @@ app.post('/api/applications', limits.forms, limits.formsGlobal, upload.single('r
 });
 
 // Protected Endpoints - Applications inbox
-app.get('/api/applications', requireAdmin, (req, res) => {
+app.get('/api/applications', ...requireRole('hr'), (req, res) => {
     try {
         res.json(db.prepare('SELECT * FROM applications ORDER BY date DESC').all());
     } catch (err) {
@@ -386,7 +387,7 @@ app.get('/api/applications', requireAdmin, (req, res) => {
     }
 });
 
-app.get('/api/applications/:id/resume', requireAdmin, (req, res) => {
+app.get('/api/applications/:id/resume', ...requireRole('hr'), (req, res) => {
     try {
         const row = db.prepare('SELECT resume FROM applications WHERE id = ?').get(req.params.id);
         const file = row?.resume && path.join(uploadsDir, path.basename(row.resume));
@@ -397,10 +398,11 @@ app.get('/api/applications/:id/resume', requireAdmin, (req, res) => {
     }
 });
 
-app.delete('/api/applications/:id', requireAdmin, (req, res) => {
+app.delete('/api/applications/:id', ...requireRole('hr'), (req, res) => {
     try {
         const row = db.prepare('SELECT resume FROM applications WHERE id = ?').get(req.params.id);
         db.prepare('DELETE FROM applications WHERE id = ?').run(req.params.id);
+        audit(req, 'application.delete', `#${req.params.id}`);
         if (row?.resume) fs.unlink(path.join(uploadsDir, path.basename(row.resume)), () => {});
         res.json({ success: true });
     } catch (err) {
@@ -409,7 +411,7 @@ app.delete('/api/applications/:id', requireAdmin, (req, res) => {
 });
 
 // Protected Endpoint - View leads
-app.get('/api/inquiries', requireAdmin, (req, res) => {
+app.get('/api/inquiries', ...requireRole('sales'), (req, res) => {
     try {
         const inquiries = db.prepare('SELECT * FROM inquiries ORDER BY date DESC').all();
         res.json(inquiries);
@@ -419,7 +421,7 @@ app.get('/api/inquiries', requireAdmin, (req, res) => {
 });
 
 // Protected Endpoint - Move a lead through the pipeline / add notes
-app.patch('/api/inquiries/:id', requireAdmin, (req, res) => {
+app.patch('/api/inquiries/:id', ...requireRole('sales'), (req, res) => {
     try {
         const { status, notes } = req.body;
         if (status !== undefined && !LEAD_STATUSES.includes(status)) {
@@ -429,6 +431,7 @@ app.patch('/api/inquiries/:id', requireAdmin, (req, res) => {
             'UPDATE inquiries SET status = COALESCE(?, status), notes = COALESCE(?, notes), updatedAt = ? WHERE id = ?'
         ).run(status ?? null, notes === undefined ? null : String(notes).slice(0, 5000), new Date().toISOString(), req.params.id);
         if (!info.changes) return res.status(404).json({ error: 'Lead not found' });
+        audit(req, 'lead.update', `#${req.params.id}${status ? ` -> ${status}` : ''}`);
         res.json(db.prepare('SELECT * FROM inquiries WHERE id = ?').get(req.params.id));
     } catch (err) {
         sendError(res, err);
@@ -436,7 +439,7 @@ app.patch('/api/inquiries/:id', requireAdmin, (req, res) => {
 });
 
 // Protected Endpoint - Download a lead's RFQ attachment
-app.get('/api/inquiries/:id/attachment', requireAdmin, (req, res) => {
+app.get('/api/inquiries/:id/attachment', ...requireRole('sales'), (req, res) => {
     try {
         const row = db.prepare('SELECT attachment FROM inquiries WHERE id = ?').get(req.params.id);
         const file = row?.attachment && path.join(uploadsDir, path.basename(row.attachment));
@@ -447,10 +450,11 @@ app.get('/api/inquiries/:id/attachment', requireAdmin, (req, res) => {
     }
 });
 
-app.delete('/api/inquiries/:id', requireAdmin, (req, res) => {
+app.delete('/api/inquiries/:id', ...requireRole('sales'), (req, res) => {
     try {
         const row = db.prepare('SELECT attachment FROM inquiries WHERE id = ?').get(req.params.id);
         db.prepare('DELETE FROM inquiries WHERE id = ?').run(req.params.id);
+        audit(req, 'lead.delete', `#${req.params.id}`);
         if (row?.attachment) fs.unlink(path.join(uploadsDir, path.basename(row.attachment)), () => {});
         res.json({ success: true });
     } catch (err) {
@@ -470,21 +474,23 @@ app.get('/api/jobs', (req, res) => {
     }
 });
 
-app.post('/api/jobs', requireAdmin, (req, res) => {
+app.post('/api/jobs', ...requireRole('hr'), (req, res) => {
     try {
         const [title, dept, location, type] = ['title', 'dept', 'location', 'type'].map(k => clip(req.body[k], 120));
         if (!title || !dept || !location || !type) return res.status(400).json({ error: 'All job fields are required' });
         const info = db.prepare('INSERT INTO jobs (title, dept, location, type) VALUES (?, ?, ?, ?)')
             .run(title, dept, location, type);
+        audit(req, 'job.create', title);
         res.json({ id: info.lastInsertRowid, title, dept, location, type });
     } catch (err) {
         sendError(res, err);
     }
 });
 
-app.delete('/api/jobs/:id', requireAdmin, (req, res) => {
+app.delete('/api/jobs/:id', ...requireRole('hr'), (req, res) => {
     try {
         db.prepare('DELETE FROM jobs WHERE id = ?').run(req.params.id);
+        audit(req, 'job.delete', `#${req.params.id}`);
         res.json({ success: true });
     } catch (err) {
         sendError(res, err);
@@ -503,22 +509,24 @@ app.get('/api/csr', (req, res) => {
     }
 });
 
-app.post('/api/csr', requireAdmin, (req, res) => {
+app.post('/api/csr', ...requireRole('marketing'), (req, res) => {
     try {
         const title = clip(req.body.title, 200), category = clip(req.body.category, 100), date = clip(req.body.date, 40);
         const description = clip(req.body.description, 5000), image = clip(req.body.image, 500);
         if (!title || !category || !date) return res.status(400).json({ error: 'Title, category and date are required' });
         const info = db.prepare('INSERT INTO csr_initiatives (title, category, date, description, image) VALUES (?, ?, ?, ?, ?)')
             .run(title, category, date, description, image);
+        audit(req, 'csr.create', title);
         res.json({ id: info.lastInsertRowid, title, category, date, description, image });
     } catch (err) {
         sendError(res, err);
     }
 });
 
-app.delete('/api/csr/:id', requireAdmin, (req, res) => {
+app.delete('/api/csr/:id', ...requireRole('marketing'), (req, res) => {
     try {
         db.prepare('DELETE FROM csr_initiatives WHERE id = ?').run(req.params.id);
+        audit(req, 'csr.delete', `#${req.params.id}`);
         res.json({ success: true });
     } catch (err) {
         sendError(res, err);
@@ -538,7 +546,7 @@ app.get('/api/blogs', (req, res) => {
     }
 });
 
-app.post('/api/blogs', requireAdmin, (req, res) => {
+app.post('/api/blogs', ...requireRole('marketing'), (req, res) => {
     try {
         // Handle input mapping if client submits title instead of headline
         const headlineText = clip(req.body.headline || req.body.title, 300);
@@ -549,15 +557,17 @@ app.post('/api/blogs', requireAdmin, (req, res) => {
         }
         const info = db.prepare('INSERT INTO blogs (headline, category, readTime, date, excerpt, image, content) VALUES (?, ?, ?, ?, ?, ?, ?)')
             .run(headlineText, category, readTime, date, excerpt, image, content);
+        audit(req, 'blog.create', headlineText);
         res.json({ id: info.lastInsertRowid, title: headlineText, category, readTime, date, excerpt, image, content });
     } catch (err) {
         sendError(res, err);
     }
 });
 
-app.delete('/api/blogs/:id', requireAdmin, (req, res) => {
+app.delete('/api/blogs/:id', ...requireRole('marketing'), (req, res) => {
     try {
         db.prepare('DELETE FROM blogs WHERE id = ?').run(req.params.id);
+        audit(req, 'blog.delete', `#${req.params.id}`);
         res.json({ success: true });
     } catch (err) {
         sendError(res, err);
@@ -567,7 +577,7 @@ app.delete('/api/blogs/:id', requireAdmin, (req, res) => {
 // =======================
 // SETTINGS API
 // =======================
-app.get('/api/settings', requireAdmin, (req, res) => {
+app.get('/api/settings', ...requireRole('hr'), (req, res) => {
     try {
         const rows = db.prepare('SELECT * FROM settings').all();
         const settingsMap = rows.reduce((acc, row) => {
@@ -580,7 +590,7 @@ app.get('/api/settings', requireAdmin, (req, res) => {
     }
 });
 
-app.post('/api/settings', requireAdmin, (req, res) => {
+app.post('/api/settings', ...requireRole('hr'), (req, res) => {
     try {
         const settings = Object.fromEntries(Object.entries(req.body || {}).map(([k, v]) => [clip(k, 60), clip(v, 500)]));
         const stmt = db.prepare('UPDATE settings SET value = ? WHERE key = ?');
@@ -591,6 +601,7 @@ app.post('/api/settings', requireAdmin, (req, res) => {
                 stmt.run(value, key);
             }
             db.exec('COMMIT');
+            audit(req, 'settings.update', Object.keys(settings).join(', '));
         } catch (err) {
             db.exec('ROLLBACK');
             throw err;

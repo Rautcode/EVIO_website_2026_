@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { DC_PROGRAMMES } from '../../data/dataCentresData';
 import { projectsData } from '../../data/projectsData';
+import { DataContext } from '../../context/DataContext';
 
 // ponytail: no site photo per data centre programme yet; cards show the plain EVIO block until supplied
 const DC_IMAGES = {};
@@ -90,10 +91,13 @@ const categories = ['All', 'Data Centers', 'Manufacturing', 'Chemical', 'Infrast
 
 export const ProjectGalleryGrid = () => {
     const [activeFilter, setActiveFilter] = useState('All');
+    const { dbProjects } = useContext(DataContext);
+    // Case studies added in the admin panel go after the built-in ones
+    const all = [...projects, ...(dbProjects || []).filter(d => !caseStudyIds.has(d.id)).map(d => ({ ...d, hasDetail: true }))];
 
     const filteredProjects = activeFilter === 'All'
-        ? projects
-        : projects.filter(p => p.sector === activeFilter);
+        ? all
+        : all.filter(p => p.sector === activeFilter);
 
     return (
         <section className="py-24 px-6 relative bg-evio-light-gray">

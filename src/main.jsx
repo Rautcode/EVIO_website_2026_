@@ -38,6 +38,10 @@ const AdminCareers = React.lazy(() => import('./pages/admin/AdminCareers').then(
 const AdminCSR = React.lazy(() => import('./pages/admin/AdminCSR').then(m => ({ default: m.AdminCSR })))
 const AdminBlog = React.lazy(() => import('./pages/admin/AdminBlog').then(m => ({ default: m.AdminBlog })))
 const AdminInquiries = React.lazy(() => import('./pages/admin/AdminInquiries').then(m => ({ default: m.AdminInquiries })))
+const AdminProjects = React.lazy(() => import('./pages/admin/AdminProjects').then(m => ({ default: m.AdminProjects })))
+const AdminUsers = React.lazy(() => import('./pages/admin/AdminUsers').then(m => ({ default: m.AdminUsers })))
+const AdminActivity = React.lazy(() => import('./pages/admin/AdminActivity').then(m => ({ default: m.AdminActivity })))
+const AdminAccount = React.lazy(() => import('./pages/admin/AdminAccount').then(m => ({ default: m.AdminAccount })))
 
 // Branded Loading Fallback
 const PageLoader = () => (
@@ -85,6 +89,10 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                 <Route path="csr" element={<AdminCSR />} />
                 <Route path="blog" element={<AdminBlog />} />
                 <Route path="inquiries" element={<AdminInquiries />} />
+                <Route path="projects" element={<AdminProjects />} />
+                <Route path="users" element={<AdminUsers />} />
+                <Route path="activity" element={<AdminActivity />} />
+                <Route path="account" element={<AdminAccount />} />
             </Route>
           </Routes>
         </React.Suspense>

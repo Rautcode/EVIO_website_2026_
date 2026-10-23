@@ -1,6 +1,7 @@
 import { useState, useContext } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { DataContext } from '../../context/DataContext';
+import { ImageUpload } from '../../components/admin/ImageUpload';
 
 export const AdminCSR = () => {
     const { csrInitiatives, addCsr, deleteCsr } = useContext(DataContext);
@@ -26,7 +27,7 @@ export const AdminCSR = () => {
             category,
             date,
             description,
-            image: image || 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?q=80&w=800&auto=format&fit=crop'
+            image
         };
         await addCsr(newInitiative);
         setIsAdding(false);
@@ -87,8 +88,7 @@ export const AdminCSR = () => {
                                     <input type="text" value={date} onChange={e => setDate(e.target.value)} required className="w-full px-4 py-2.5 rounded-lg border border-evio-black/10 focus:border-evio-blue outline-none" placeholder="e.g. Nov 2024 or Ongoing" />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-inter text-evio-navy font-bold mb-2">Cover Image URL</label>
-                                    <input type="url" value={image} onChange={e => setImage(e.target.value)} className="w-full px-4 py-2.5 rounded-lg border border-evio-black/10 focus:border-evio-blue outline-none" placeholder="https://unsplash.com/..." />
+                                    <ImageUpload label="Cover image" value={image} onChange={setImage} />
                                 </div>
                             </div>
                             
@@ -134,7 +134,7 @@ export const AdminCSR = () => {
                                         {item.category}
                                     </span>
                                 </div>
-                                <img src={item.image} alt={item.title} className="absolute inset-0 w-full h-full object-cover" />
+                                {item.image && <img src={item.image} alt={item.title} className="absolute inset-0 w-full h-full object-cover" />}
                             </div>
                             <div className="p-6 flex flex-col flex-grow">
                                 <p className="text-xs font-inter text-evio-black/40 mb-2">{item.date}</p>
