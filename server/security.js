@@ -64,6 +64,7 @@ const limits = {
     api: rateLimit({ windowMs: 15 * 60_000, max: 300, message: 'Too many requests. Please try again in a few minutes.' }),
     forms: rateLimit({ windowMs: 15 * 60_000, max: 8, message: 'Too many submissions. Please try again in 15 minutes or call us directly.' }),
     login: rateLimit({ windowMs: 15 * 60_000, max: 5, message: 'Too many login attempts. Please try again in 15 minutes.' }),
+    ai: rateLimit({ windowMs: 15 * 60_000, max: 20, message: 'Too many AI drafts. Please wait a few minutes.' }),
     // Site-wide caps. req.ip comes from X-Forwarded-For, which a caller hitting the Render URL directly
     // (bypassing Vercel) can forge, so per-IP limits alone can't stop a distributed brute force or form flood.
     loginGlobal: rateLimit({ windowMs: 15 * 60_000, max: 30, key: () => 'all', message: 'Login is temporarily locked. Please try again in 15 minutes.' }),
@@ -110,7 +111,8 @@ const parseCookies = (header = '') => Object.fromEntries(
 );
 
 const setSession = (res, user) => {
-    const token = jwt.sign({ sub: String(user.id), username: user.username }, JWT_SECRET,
+    // `ver` = the user's tokenVersion; bumping it (password change, role change, disable) ends all their sessions
+    const token = jwt.sign({ sub: String(user.id), username: user.username, ver: user.tokenVersion || 0 }, JWT_SECRET,
         { expiresIn: `${SESSION_HOURS}h`, issuer: ISSUER, algorithm: 'HS256' });
     res.cookie(SESSION_COOKIE, token, {
         httpOnly: true,            // not readable by page scripts, so XSS can't steal it
@@ -123,23 +125,34 @@ const setSession = (res, user) => {
 
 const clearSession = (res) => res.clearCookie(SESSION_COOKIE, { path: '/api', httpOnly: true, secure: IS_PROD, sameSite: 'strict' });
 
-let userExists = () => false;
-const setUserLookup = (fn) => { userExists = fn; };
+// Roles: admin = everything; the others see only their own area of the admin panel.
+const ROLES = ['admin', 'sales', 'hr', 'marketing'];
+
+let findUser = () => null;
+const setUserLookup = (fn) => { findUser = fn; };
 
 const requireAdmin = (req, res, next) => {
     const token = parseCookies(req.headers.cookie)[SESSION_COOKIE];
     if (!token) return res.status(401).json({ error: 'Not signed in' });
     try {
         const claims = jwt.verify(token, JWT_SECRET, { algorithms: ['HS256'], issuer: ISSUER });
-        // A deleted admin account loses access immediately, not when its token expires
-        if (!userExists(Number(claims.sub))) throw new Error('user removed');
-        req.admin = { id: Number(claims.sub), username: claims.username };
+        // Role and revocation come from the database on every request, so a deleted, disabled or
+        // re-roled user (or one whose password changed) loses access at once, not when the token expires.
+        const user = findUser(Number(claims.sub));
+        if (!user || user.disabled || (user.tokenVersion || 0) !== (claims.ver || 0)) throw new Error('session revoked');
+        req.admin = { id: user.id, username: user.username, role: user.role };
         next();
     } catch {
         clearSession(res);
         res.status(401).json({ error: 'Session expired. Please sign in again.' });
     }
 };
+
+// Signed in AND one of the given roles (admin always passes). Use as: app.get(path, ...requireRole('sales'), handler)
+const requireRole = (...roles) => [requireAdmin, (req, res, next) =>
+    req.admin.role === 'admin' || roles.includes(req.admin.role)
+        ? next()
+        : res.status(403).json({ error: 'Your account does not have access to this section.' })];
 
 // Defence in depth on top of SameSite: state-changing requests must come from our own origins.
 const sameOriginWrites = (allowedOrigins) => (req, res, next) => {
@@ -165,5 +178,5 @@ const clip = (v, max) => (v ?? '').toString().slice(0, max);
 
 module.exports = {
     JWT_SECRET, securityHeaders, limits, issueFormToken, spamGuard,
-    setSession, clearSession, requireAdmin, setUserLookup, sameOriginWrites, errorHandler, clip,
+    setSession, clearSession, requireAdmin, requireRole, ROLES, setUserLookup, sameOriginWrites, errorHandler, clip,
 };

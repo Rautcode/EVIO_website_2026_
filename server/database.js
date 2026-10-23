@@ -108,6 +108,42 @@ const initDb = () => {
         if (!inquiryCols.includes(col)) db.exec(`ALTER TABLE inquiries ADD COLUMN ${col} ${type}`);
     }
 
+    // Admin accounts: role (admin|sales|hr|marketing), disable switch, and tokenVersion to revoke sessions.
+    // The original single `admin` user becomes role admin.
+    const userCols = db.prepare('PRAGMA table_info(users)').all().map(c => c.name);
+    const newUserCols = {
+        role: "TEXT NOT NULL DEFAULT 'admin'", disabled: 'INTEGER NOT NULL DEFAULT 0',
+        tokenVersion: 'INTEGER NOT NULL DEFAULT 0', createdAt: 'TEXT',
+    };
+    for (const [col, type] of Object.entries(newUserCols)) {
+        if (!userCols.includes(col)) db.exec(`ALTER TABLE users ADD COLUMN ${col} ${type}`);
+    }
+
+    // Who did what in the admin panel
+    db.exec(`
+        CREATE TABLE IF NOT EXISTS audit_log (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            at TEXT NOT NULL,
+            userId INTEGER,
+            username TEXT,
+            action TEXT NOT NULL,
+            target TEXT
+        )
+    `);
+
+    // Case studies added from the admin panel (the curated ones ship in src/data/projectsData.js).
+    // `data` is the case study as JSON, validated on write in admin.js.
+    db.exec(`
+        CREATE TABLE IF NOT EXISTS projects (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            slug TEXT UNIQUE NOT NULL,
+            data TEXT NOT NULL,
+            published INTEGER NOT NULL DEFAULT 1,
+            createdAt TEXT NOT NULL,
+            updatedAt TEXT NOT NULL
+        )
+    `);
+
     console.log('✅ SQLite Tables Initialized Successfully');
 
     // Seed Data if empty

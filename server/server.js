@@ -114,7 +114,9 @@ app.use(sameOriginWrites(allowedOrigins));
 
 // Initialize Database
 initDb();
-setUserLookup((id) => !!db.prepare('SELECT 1 FROM users WHERE id = ?').get(id));
+setUserLookup((id) => db.prepare('SELECT * FROM users WHERE id = ?').get(id));
+require('./admin').registerAdminRoutes(app);
+require('./ai').registerAiRoutes(app);
 
 // ==========================================
 // UTILITIES & CUSTOM MIDDLEWARE
@@ -171,7 +173,7 @@ app.post('/api/auth/login', limits.login, limits.loginGlobal, async (req, res) =
     }
 });
 
-app.get('/api/auth/me', requireAdmin, (req, res) => res.json({ username: req.admin.username }));
+app.get('/api/auth/me', requireAdmin, (req, res) => res.json({ username: req.admin.username, role: req.admin.role }));
 app.post('/api/auth/logout', (req, res) => { clearSession(res); res.json({ success: true }); });
 
 // Anti-spam token for the public forms (contact, RFQ, downloads, careers)
